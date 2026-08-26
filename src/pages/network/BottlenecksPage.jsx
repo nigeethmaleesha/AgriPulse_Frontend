@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, AlertTriangle, Clock3, Gauge, ListOrdered, Search } from 'lucide-react'
+import { Activity, AlertTriangle, ListOrdered, Search, ShieldAlert } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { networkApi } from '../../api/networkApi'
 import { apiErrorMessage } from '../../api/client'
@@ -12,6 +12,15 @@ import { MetricTile } from '../../components/ui/MetricTile'
 import { EmptyState, ErrorState, InlineError, LoadingState } from '../../components/ui/Feedback'
 import { EndpointSelector } from '../../components/network/EndpointSelector'
 import { Field, inputClass } from '../../components/ui/FormControls'
+import { impactAction } from '../../utils/displayLabels'
+
+function friendlyImpact(level, percent) {
+  const p = Number(percent)
+  if (String(level || '').toUpperCase().includes('CRITICAL') || p >= 25) return { label: 'Very high', tone: 'red' }
+  if (String(level || '').toUpperCase().includes('HIGH') || p >= 10) return { label: 'High', tone: 'red' }
+  if (p > 0) return { label: 'Moderate', tone: 'amber' }
+  return { label: 'Low', tone: 'neutral' }
+}
 
 export default function BottlenecksPage() {
   const { graph, loading, error, refreshGraph } = useNetwork()
@@ -28,7 +37,7 @@ export default function BottlenecksPage() {
   useEffect(() => { if (!sinkCode && sinkDefault) setSinkCode(sinkDefault) }, [sinkDefault, sinkCode])
 
   const run = async () => {
-    if (!sourceCode || !sinkCode) return setRunError('Select both source and factory nodes.')
+    if (!sourceCode || !sinkCode) return setRunError('Select the supply starting point and destination factory.')
     setRunning(true); setRunError('')
     try { setResult(await networkApi.analyzeBottlenecks({ sourceCode, sinkCode, topN: Number(topN) })) }
     catch (err) { setRunError(apiErrorMessage(err)) }
@@ -38,59 +47,67 @@ export default function BottlenecksPage() {
   if (loading) return <Panel><LoadingState /></Panel>
   if (error) return <Panel><ErrorState message={error} onRetry={() => refreshGraph().catch(() => undefined)} /></Panel>
 
-  const chartData = (result?.exactClosureImpactRanking || []).slice(0, 8).map((r) => ({ name: `${r.fromCode}→${r.toCode}`, loss: r.throughputLossIfClosedKgPerDay, impact: r.throughputImpactPercent }))
+  const priorityRows = result?.exactClosureImpactRanking || []
+  const chartData = priorityRows.slice(0, 8).map((r) => ({ name: `${r.fromCode}→${r.toCode}`, loss: r.throughputLossIfClosedKgPerDay }))
+  const topRisk = priorityRows[0]
+  const currentFull = result?.linearSaturatedLinks || []
 
   return (
     <>
-      <PageHeader engine="LINEAR SCAN + MAX-HEAP + FLOW RERUNS" title="Bottleneck Analysis" description="Member 6 reuses the Member 5 Ford-Fulkerson engine to detect saturated links, rank utilization with a max-heap, and measure exact throughput impact by temporarily closing each connection in memory." />
+      <PageHeader engine="SUPPLY RISK REVIEW" title="Critical Connections" description="Find the transport connections that matter most to factory intake. The system shows which links are currently full and estimates how much daily tea delivery would be lost if a connection became unavailable." />
 
       <Panel className="mb-6 overflow-hidden">
-        <PanelHeader eyebrow="Analysis controls" title="Find the links that constrain factory throughput" description="The graph in PostgreSQL is not modified by this analysis." />
+        <PanelHeader eyebrow="Risk check" title="Find Connections That Need Protection" description="This review does not change your saved network. It only assesses operational risk." />
         <div className="grid gap-4 p-5 xl:grid-cols-[1fr_170px_auto] xl:items-end">
           <EndpointSelector nodes={graph.nodes} sourceCode={sourceCode} sinkCode={sinkCode} onSourceChange={setSourceCode} onSinkChange={setSinkCode} />
-          <Field label="Top ranked links"><input className={inputClass} type="number" min="1" max="100" value={topN} onChange={(e) => setTopN(e.target.value)} /></Field>
-          <Button onClick={run} disabled={running}>{running ? 'Analysing…' : <><Search size={16} /> Run Bottleneck Analysis</>}</Button>
+          <Field label="Number of priority results"><input className={inputClass} type="number" min="1" max="100" value={topN} onChange={(e) => setTopN(e.target.value)} /></Field>
+          <Button onClick={run} disabled={running}>{running ? 'Reviewing network…' : <><Search size={16} /> Review Critical Connections</>}</Button>
         </div>
         {runError && <div className="px-5 pb-5"><InlineError message={runError} /></div>}
       </Panel>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricTile label="Baseline Max Flow" value={result?.baselineMaximumFlowKgPerDay?.toLocaleString?.() ?? '—'} suffix={result ? 'kg/day' : ''} icon={Activity} />
-        <MetricTile label="Saturated Links" value={result?.linearSaturatedLinks?.length ?? '—'} icon={AlertTriangle} tone={(result?.linearSaturatedLinks?.length || 0) > 0 ? 'amber' : 'green'} />
-        <MetricTile label="Edges Analysed" value={result?.edgeCount ?? graph.edges.filter((e) => e.active).length} icon={Gauge} />
-        <MetricTile label="Ranked Results" value={result?.exactClosureImpactRanking?.length ?? '—'} icon={ListOrdered} />
+        <MetricTile label="Current daily throughput" value={result?.baselineMaximumFlowKgPerDay?.toLocaleString?.() ?? '—'} suffix={result ? 'kg/day' : ''} icon={Activity} />
+        <MetricTile label="Connections at capacity" value={result?.linearSaturatedLinks?.length ?? '—'} icon={AlertTriangle} tone={(result?.linearSaturatedLinks?.length || 0) > 0 ? 'amber' : 'green'} />
+        <MetricTile label="Connections reviewed" value={result?.edgeCount ?? graph.edges.filter((e) => e.active).length} icon={ShieldAlert} />
+        <MetricTile label="Priority risks found" value={priorityRows.length || '—'} icon={ListOrdered} />
       </div>
 
-      {!result ? <Panel><EmptyState title="Bottleneck analysis has not been run" description="Choose source/sink nodes and run the analysis to compare all three Member 6 methods." /></Panel> : <>
-        <div className="grid gap-6 2xl:grid-cols-[1fr_.9fr]">
+      {!result ? <Panel><EmptyState title="No risk review yet" description="Choose the supply origin and factory, then review critical connections." /></Panel> : <>
+        {topRisk && <Panel className="mb-6 overflow-hidden border-red-200/80">
+          <div className="grid gap-5 bg-red-50/65 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-[.12em] text-red-700">Highest priority connection</div>
+              <div className="mt-2 font-mono text-2xl font-extrabold text-graphite">{topRisk.fromCode} → {topRisk.toCode}</div>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-red-800">If this connection becomes unavailable, factory delivery capacity is estimated to fall by <b>{topRisk.throughputLossIfClosedKgPerDay.toLocaleString()} kg/day</b> ({Number(topRisk.throughputImpactPercent).toFixed(2)}%).</p>
+              <p className="mt-2 text-sm font-bold text-red-900">Recommended action: {impactAction(topRisk.throughputImpactPercent)}.</p>
+            </div>
+            <Badge tone="red">Priority #1</Badge>
+          </div>
+        </Panel>}
+
+        <div className="grid gap-6 2xl:grid-cols-[1.1fr_.9fr]">
           <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Exact impact" title="Throughput Loss if Link is Closed" description="Higher loss means the link has a larger direct effect on maximum factory throughput." />
+            <PanelHeader eyebrow="Potential disruption impact" title="Daily Tea Delivery Lost if a Connection Fails" description="Taller bars represent connections with a larger effect on factory intake." />
             <div className="h-[340px] p-4">
-              {chartData.length ? <ResponsiveContainer width="100%" height="100%"><BarChart data={chartData} margin={{ top: 10, right: 16, left: 8, bottom: 50 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="name" angle={-25} textAnchor="end" height={65} tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} unit=" kg" /><Tooltip formatter={(v) => [`${Number(v).toLocaleString()} kg/day`, 'Throughput loss']} /><Bar dataKey="loss" fill="#2F6B4F" radius={[6,6,0,0]} /></BarChart></ResponsiveContainer> : <EmptyState />}
+              {chartData.length ? <ResponsiveContainer width="100%" height="100%"><BarChart data={chartData} margin={{ top: 10, right: 16, left: 8, bottom: 50 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="name" angle={-25} textAnchor="end" height={65} tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} unit=" kg" /><Tooltip formatter={(v) => [`${Number(v).toLocaleString()} kg/day`, 'Estimated delivery loss']} /><Bar dataKey="loss" fill="#2F6B4F" radius={[6,6,0,0]} /></BarChart></ResponsiveContainer> : <EmptyState />}
             </div>
           </Panel>
 
           <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Candidate method 1" title="Linear Saturated-Edge Scan" description="Directly identifies links whose residual capacity is zero in the baseline max-flow result." />
-            {result.linearSaturatedLinks?.length ? <div className="divide-y divide-tea-950/7">{result.linearSaturatedLinks.map((r) => <div key={`${r.fromCode}-${r.toCode}`} className="grid grid-cols-[1fr_auto] gap-4 px-5 py-4"><div><div className="font-mono text-sm font-bold text-graphite">{r.fromCode} → {r.toCode}</div><div className="mt-1 text-xs text-muted">{r.flowKgPerDay.toLocaleString()} / {r.capacityKgPerDay.toLocaleString()} kg/day</div></div><Badge tone="red">{Number(r.utilizationPercent).toFixed(1)}%</Badge></div>)}</div> : <EmptyState title="No saturated links" description="The baseline result did not return any fully saturated edge." />}
-          </Panel>
-        </div>
-
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
-          <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Candidate method 2" title="Max-Heap Utilization Ranking" description="Ranks the highest-utilization links first." />
-            <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-sm"><thead className="bg-tea-50/70 text-left text-[11px] uppercase tracking-[.08em] text-muted"><tr><th className="px-4 py-3">Rank</th><th className="px-4 py-3">Link</th><th className="px-4 py-3">Flow / Capacity</th><th className="px-4 py-3">Util.</th><th className="px-4 py-3">State</th></tr></thead><tbody className="divide-y divide-tea-950/7">{result.heapRankedLinks.map((r) => <tr key={`${r.rank}-${r.fromCode}-${r.toCode}`}><td className="px-4 py-3 font-mono font-bold">#{r.rank}</td><td className="px-4 py-3 font-mono font-semibold">{r.fromCode} → {r.toCode}</td><td className="px-4 py-3 font-mono text-xs">{r.flowKgPerDay.toLocaleString()} / {r.capacityKgPerDay.toLocaleString()}</td><td className="px-4 py-3 font-mono font-bold">{Number(r.utilizationPercent).toFixed(1)}%</td><td className="px-4 py-3"><Badge tone={r.saturated ? 'red' : r.utilizationPercent >= 85 ? 'amber' : 'green'}>{r.saturated ? 'Saturated' : 'Open'}</Badge></td></tr>)}</tbody></table></div>
-          </Panel>
-
-          <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Candidate method 3" title="Exact Closure Impact Ranking" description="Reruns Ford-Fulkerson with each candidate link closed and ranks the observed throughput loss." />
-            <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-sm"><thead className="bg-tea-50/70 text-left text-[11px] uppercase tracking-[.08em] text-muted"><tr><th className="px-4 py-3">Rank</th><th className="px-4 py-3">Link</th><th className="px-4 py-3">Loss</th><th className="px-4 py-3">Impact</th><th className="px-4 py-3">Level</th></tr></thead><tbody className="divide-y divide-tea-950/7">{result.exactClosureImpactRanking.map((r) => <tr key={`${r.rank}-${r.fromCode}-${r.toCode}`}><td className="px-4 py-3 font-mono font-bold">#{r.rank}</td><td className="px-4 py-3 font-mono font-semibold">{r.fromCode} → {r.toCode}</td><td className="px-4 py-3 font-mono font-bold">{r.throughputLossIfClosedKgPerDay.toLocaleString()} kg/day</td><td className="px-4 py-3 font-mono">{Number(r.throughputImpactPercent).toFixed(2)}%</td><td className="px-4 py-3"><Badge tone={r.impactLevel?.toLowerCase().includes('high') || r.throughputImpactPercent >= 20 ? 'red' : r.throughputImpactPercent > 0 ? 'amber' : 'neutral'}>{r.impactLevel}</Badge></td></tr>)}</tbody></table></div>
+            <PanelHeader eyebrow="Current pressure" title="Connections Already at Full Daily Limit" description="These routes currently have no spare carrying capacity in the latest network check." />
+            {currentFull.length ? <div className="divide-y divide-tea-950/7">{currentFull.map((r) => <div key={`${r.fromCode}-${r.toCode}`} className="grid grid-cols-[1fr_auto] gap-4 px-5 py-4"><div><div className="font-mono text-sm font-bold text-graphite">{r.fromCode} → {r.toCode}</div><div className="mt-1 text-xs text-muted">Moving {r.flowKgPerDay.toLocaleString()} of {r.capacityKgPerDay.toLocaleString()} kg/day</div></div><Badge tone="red">At capacity</Badge></div>)}</div> : <EmptyState title="No connection is fully loaded" description="Every active connection currently has some spare daily carrying capacity." />}
           </Panel>
         </div>
 
         <Panel className="mt-6 overflow-hidden">
-          <PanelHeader eyebrow="Measured evidence" title="Method Performance" description="Execution time and estimated peak algorithm memory returned by the backend analysis." />
-          <div className="grid gap-4 p-5 md:grid-cols-3">{result.methodPerformance.map((m, i) => <div key={m.method || i} className="rounded-2xl border border-tea-950/10 bg-white p-4"><div className="text-sm font-bold text-graphite">{m.method}</div><div className="mt-4 grid grid-cols-2 gap-3"><div><div className="text-[10px] font-bold uppercase tracking-wider text-muted">Execution</div><div className="mt-1 font-mono text-lg font-bold">{Number(m.executionTimeMs).toFixed(4)} ms</div></div><div><div className="text-[10px] font-bold uppercase tracking-wider text-muted">Memory</div><div className="mt-1 font-mono text-lg font-bold">{Number(m.estimatedPeakAlgorithmMemoryMb).toFixed(4)} MB</div></div></div></div>)}</div>
+          <PanelHeader eyebrow="Management priority" title="Connection Risk Ranking" description="Use this list to decide where backup transport, maintenance or capacity investment is most valuable." />
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-sm">
+              <thead className="bg-tea-50/70 text-left text-[11px] uppercase tracking-[.08em] text-muted"><tr><th className="px-4 py-3">Priority</th><th className="px-4 py-3">Connection</th><th className="px-4 py-3">Current use</th><th className="px-4 py-3">Delivery loss if unavailable</th><th className="px-4 py-3">Factory impact</th><th className="px-4 py-3">Suggested action</th></tr></thead>
+              <tbody className="divide-y divide-tea-950/7">{priorityRows.map((r) => { const impact = friendlyImpact(r.impactLevel, r.throughputImpactPercent); return <tr key={`${r.rank}-${r.fromCode}-${r.toCode}`}><td className="px-4 py-3 font-mono font-bold">#{r.rank}</td><td className="px-4 py-3 font-mono font-semibold">{r.fromCode} → {r.toCode}</td><td className="px-4 py-3 font-mono">{Number(r.baselineUtilizationPercent ?? 0).toFixed(1)}%</td><td className="px-4 py-3 font-mono font-bold">{r.throughputLossIfClosedKgPerDay.toLocaleString()} kg/day</td><td className="px-4 py-3"><Badge tone={impact.tone}>{impact.label} · {Number(r.throughputImpactPercent).toFixed(1)}%</Badge></td><td className="px-4 py-3 text-sm font-semibold text-graphite">{impactAction(r.throughputImpactPercent)}</td></tr>})}</tbody>
+            </table>
+          </div>
         </Panel>
       </>}
     </>

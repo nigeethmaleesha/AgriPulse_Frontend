@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, Boxes, CheckCircle2, Factory, GitBranch, Network, Route, Sprout, Waves } from 'lucide-react'
+import { Activity, ArrowRight, Boxes, CheckCircle2, GitBranch, ShieldAlert, SlidersHorizontal } from 'lucide-react'
 import { networkApi } from '../api/networkApi'
 import { apiErrorMessage } from '../api/client'
 import { useNetwork } from '../context/NetworkContext'
@@ -11,12 +11,25 @@ import { Panel, PanelHeader } from '../components/ui/Panel'
 import { ErrorState, LoadingState } from '../components/ui/Feedback'
 import { NetworkGraph } from '../components/network/NetworkGraph'
 
-const flow = [
-  { code: 'M02', title: 'Farm Resources', subtitle: 'Not connected', icon: Sprout, active: false },
-  { code: 'M04', title: 'Harvest & Risk', subtitle: 'Not connected', icon: Waves, active: false },
-  { code: 'M01', title: 'Collection Dispatch', subtitle: 'Not connected', icon: Route, active: false },
-  { code: 'M03', title: 'Network Capacity', subtitle: 'Connected', icon: Network, active: true },
-  { code: 'M05', title: 'Factory Processing', subtitle: 'Not connected', icon: Factory, active: false },
+const actions = [
+  {
+    title: 'Check daily delivery capacity',
+    description: 'See how much tea the current transport network can deliver to the factory today.',
+    to: '/network',
+    icon: Activity,
+  },
+  {
+    title: 'Review vulnerable connections',
+    description: 'Identify roads or handling links that could cause the largest production impact if unavailable.',
+    to: '/network/bottlenecks',
+    icon: ShieldAlert,
+  },
+  {
+    title: 'Compare improvement plans',
+    description: 'Test road closures, reduced capacity or upgrades before changing the real operating network.',
+    to: '/network/scenarios',
+    icon: SlidersHorizontal,
+  },
 ]
 
 export default function DashboardPage() {
@@ -31,61 +44,52 @@ export default function DashboardPage() {
 
   const activeEdges = graph.edges.filter((e) => e.active)
   const activeNodes = graph.nodes.filter((n) => n.active)
-  const latest = recent[0]
+  const latest = recent.find((r) => { const name = String(r.algorithm || '').toLowerCase(); return name.includes('ford') || name.includes('max flow') || name.includes('synthetic') }) || recent[0]
 
   return (
     <>
       <div className="topographic relative mb-6 overflow-hidden rounded-[26px] px-6 py-7 text-white shadow-soft sm:px-8 sm:py-8">
         <div className="relative z-10 max-w-3xl">
-          <div className="mb-3 flex items-center gap-2"><Badge tone="green" className="!bg-white/12 !text-emerald-100">PDSA · INTEGRATED IDSS</Badge><Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">MODULE 3 LIVE</Badge></div>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Tea supply decisions, not just records.</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/68 sm:text-base">This frontend fully connects Module 3 — Tea Supply Network Capacity & Bottleneck Analysis. The other coursework modules remain visible as part of the integrated AgriPulse system, but intentionally have no API links in this build.</p>
-          <div className="mt-5 flex flex-wrap gap-3"><Link to="/network"><Button className="!bg-white !text-tea-950 hover:!bg-emerald-50">Open Network Analysis <ArrowRight size={16} /></Button></Link><Link to="/network/bottlenecks"><Button className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/15" variant="secondary">Analyse Bottlenecks</Button></Link></div>
+          <div className="mb-3 flex items-center gap-2"><Badge tone="green" className="!bg-white/12 !text-emerald-100">TEA SUPPLY OPERATIONS</Badge><Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">LIVE NETWORK</Badge></div>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Keep tea moving to the factory.</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72 sm:text-base">Monitor how much tea the current supply network can carry, identify critical transport connections, and test improvement plans before making operational changes.</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link to="/network"><Button className="!bg-white !text-tea-950 hover:!bg-emerald-50">Check Today&apos;s Capacity <ArrowRight size={16} /></Button></Link>
+            <Link to="/network/bottlenecks"><Button className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/15" variant="secondary">Review Critical Connections</Button></Link>
+          </div>
         </div>
         <div className="absolute -bottom-24 -right-12 h-72 w-72 rounded-full border border-white/10" /><div className="absolute -bottom-10 -right-28 h-72 w-72 rounded-full border border-white/8" />
       </div>
 
-      <Panel className="mb-6 overflow-hidden">
-        <PanelHeader eyebrow="Integrated workflow" title="AgriPulse Decision Flow" description="All five coursework modules are shown as one operational chain. Only Module 3 is connected in this frontend package." />
-        <div className="overflow-x-auto p-5">
-          <div className="flex min-w-[920px] items-center">
-            {flow.map((item, index) => {
-              const Icon = item.icon
-              return <div key={item.code} className="contents">
-                <div className={`min-w-[155px] rounded-2xl border p-4 ${item.active ? 'border-tea-700/25 bg-tea-50 shadow-sm' : 'border-tea-950/8 bg-white opacity-65'}`}>
-                  <div className="flex items-center justify-between"><span className={`rounded-xl p-2 ${item.active ? 'bg-tea-950 text-white' : 'bg-stoneui text-muted'}`}><Icon size={18} /></span><span className="font-mono text-[10px] font-bold text-muted">{item.code}</span></div>
-                  <div className="mt-3 text-sm font-bold text-graphite">{item.title}</div>
-                  <div className={`mt-1 text-xs font-semibold ${item.active ? 'text-tea-700' : 'text-muted'}`}>{item.subtitle}</div>
-                </div>
-                {index < flow.length - 1 && <div className="mx-2 h-px min-w-7 flex-1 bg-tea-950/15"><ArrowRight size={14} className="-mt-[7px] ml-auto text-tea-700/45" /></div>}
-              </div>
-            })}
-          </div>
-        </div>
-      </Panel>
-
       {loading ? <Panel><LoadingState /></Panel> : error ? <Panel><ErrorState message={error} onRetry={() => refreshGraph().catch(() => undefined)} /></Panel> : <>
         <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricTile label="Active Nodes" value={activeNodes.length} icon={Boxes} caption="SOURCE · FARM · HUB · FACTORY" />
-          <MetricTile label="Active Connections" value={activeEdges.length} icon={GitBranch} caption="Directed capacity links" />
-          <MetricTile label="API State" value="LIVE" icon={CheckCircle2} caption="Spring Boot /api/network connected" />
-          <MetricTile label="Latest Saved Flow" value={latest?.solutionMetric?.toLocaleString?.() ?? '—'} suffix={latest ? 'kg/day' : ''} icon={Activity} caption={latest ? `${latest.algorithm} · ${Number(latest.executionTimeMs).toFixed(3)} ms` : 'Run max flow with Save benchmark enabled'} />
+          <MetricTile label="Active locations" value={activeNodes.length} icon={Boxes} caption="Supply points, farms, collection centres and factory" />
+          <MetricTile label="Transport connections" value={activeEdges.length} icon={GitBranch} caption="Connections currently included in planning" />
+          <MetricTile label="System status" value={apiOnline ? 'READY' : 'OFFLINE'} icon={CheckCircle2} caption={apiOnline ? 'Live network information is available' : 'Backend connection is unavailable'} tone={apiOnline ? 'green' : 'red'} />
+          <MetricTile label="Latest checked capacity" value={latest?.solutionMetric?.toLocaleString?.() ?? '—'} suffix={latest ? 'kg/day' : ''} icon={Activity} caption={latest ? 'Most recently saved daily throughput check' : 'Run a capacity check to create history'} />
         </div>
+
+        <Panel className="mb-6 overflow-hidden">
+          <PanelHeader eyebrow="Daily decision tools" title="What would you like to check?" description="These views translate the network calculation into operational information for factory and logistics teams." />
+          <div className="grid gap-4 p-5 lg:grid-cols-3">
+            {actions.map(({ title, description, to, icon: Icon }) => <Link key={to} to={to} className="group rounded-2xl border border-tea-950/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-tea-700/25 hover:shadow-sm"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-tea-50 text-tea-800"><Icon size={19} /></div><h3 className="mt-4 text-base font-extrabold text-graphite">{title}</h3><p className="mt-2 text-sm leading-6 text-muted">{description}</p><div className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-tea-800">Open <ArrowRight size={14} className="transition group-hover:translate-x-0.5" /></div></Link>)}
+          </div>
+        </Panel>
 
         <div className="grid gap-6 2xl:grid-cols-[1.5fr_.75fr]">
           <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Live graph" title="Current Tea Supply Network" description="Loaded directly from GET /api/network/graph. No route or flow value is fabricated by the frontend." action={<Link to="/network"><Button variant="secondary" size="sm">Run Ford-Fulkerson <ArrowRight size={15} /></Button></Link>} />
+            <PanelHeader eyebrow="Current supply network" title="Tea Movement Network" description="Each connection shows its planned daily carrying limit. Run a daily capacity check to see the amount of tea assigned to each connection." action={<Link to="/network"><Button variant="secondary" size="sm">Check Capacity <ArrowRight size={15} /></Button></Link>} />
             <div className="p-4"><NetworkGraph nodes={graph.nodes} edges={graph.edges} compact /></div>
           </Panel>
 
           <Panel className="overflow-hidden">
-            <PanelHeader eyebrow="Scope" title="Frontend connection status" description="Dashboard visibility is not the same as API integration." />
+            <PanelHeader eyebrow="Manager guidance" title="How to read the results" description="Use the system as a decision aid for transport and factory intake planning." />
             <div className="divide-y divide-tea-950/7">
-              {[
-                ['M01', 'Collection Dispatch', false], ['M02', 'Resource Allocation', false], ['M03', 'Network Capacity', true], ['M04', 'Spoilage Intelligence', false], ['M05', 'Factory Operations', false]
-              ].map(([code, name, connected]) => <div key={code} className="flex items-center gap-3 px-5 py-3.5"><span className="w-9 font-mono text-xs font-bold text-muted">{code}</span><span className="flex-1 text-sm font-semibold text-graphite">{name}</span><Badge tone={connected ? 'green' : 'neutral'}>{connected ? 'Connected' : 'UI only'}</Badge></div>)}
+              <div className="px-5 py-4"><div className="text-sm font-bold text-graphite">Daily Throughput</div><p className="mt-1 text-xs leading-5 text-muted">Shows the maximum amount of tea the current network can deliver to the factory per day.</p></div>
+              <div className="px-5 py-4"><div className="text-sm font-bold text-graphite">Critical Connections</div><p className="mt-1 text-xs leading-5 text-muted">Highlights connections where a disruption could cause the largest reduction in factory intake.</p></div>
+              <div className="px-5 py-4"><div className="text-sm font-bold text-graphite">What-If Planning</div><p className="mt-1 text-xs leading-5 text-muted">Tests closures, reduced capacity and upgrades without changing the real network data.</p></div>
             </div>
-            {recentError && <div className="border-t border-tea-950/8 px-5 py-3 text-xs text-amber-700">Saved results could not be loaded: {recentError}</div>}
+            {recentError && <div className="border-t border-tea-950/8 px-5 py-3 text-xs text-amber-700">Recent capacity history could not be loaded: {recentError}</div>}
           </Panel>
         </div>
       </>}

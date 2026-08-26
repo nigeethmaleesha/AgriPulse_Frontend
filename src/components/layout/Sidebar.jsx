@@ -1,22 +1,15 @@
 import { NavLink } from 'react-router-dom'
 import {
-  Activity, Boxes, ChevronLeft, ChevronRight, Factory, Gauge, GitBranch,
-  LayoutDashboard, Leaf, Network, Route, Sprout, TestTube2, Waves
+  Activity, Boxes, ChevronLeft, ChevronRight, Gauge, GitBranch,
+  LayoutDashboard, Leaf, Network, TestTube2
 } from 'lucide-react'
 
-const disabledModules = [
-  { label: 'Collection Dispatch', icon: Route, code: 'M01' },
-  { label: 'Resource Allocation', icon: Sprout, code: 'M02' },
-  { label: 'Spoilage Intelligence', icon: Waves, code: 'M04' },
-  { label: 'Factory Operations', icon: Factory, code: 'M05' },
-]
-
 const networkLinks = [
-  { to: '/network', label: 'Flow Analysis', icon: Network },
-  { to: '/network/bottlenecks', label: 'Bottlenecks', icon: Activity },
-  { to: '/network/scenarios', label: 'Scenario Lab', icon: GitBranch },
-  { to: '/network/graph', label: 'Graph Data', icon: Boxes },
-  { to: '/network/benchmarks', label: 'Benchmarks', icon: TestTube2 },
+  { to: '/network', label: 'Daily Throughput', icon: Network },
+  { to: '/network/bottlenecks', label: 'Critical Connections', icon: Activity },
+  { to: '/network/scenarios', label: 'What-If Planning', icon: GitBranch },
+  { to: '/network/graph', label: 'Network Setup', icon: Boxes },
+  { to: '/network/benchmarks', label: 'System Performance', icon: TestTube2 },
 ]
 
 function NavItem({ to, icon: Icon, children, collapsed }) {
@@ -39,45 +32,26 @@ export function Sidebar({ collapsed, onToggle }) {
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10">
           <Leaf size={21} strokeWidth={2.2} />
         </div>
-        {!collapsed && <div className="ml-3 min-w-0"><div className="text-base font-extrabold tracking-tight">AgriPulse</div><div className="truncate text-[11px] font-medium text-white/55">Tea Supply Intelligence</div></div>}
+        {!collapsed && <div className="ml-3 min-w-0"><div className="text-base font-extrabold tracking-tight">AgriPulse</div><div className="truncate text-[11px] font-medium text-white/55">Tea Supply Operations</div></div>}
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Overview</div>}
-        <NavItem to="/" icon={LayoutDashboard} collapsed={collapsed}>Decision Center</NavItem>
+        {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Operations</div>}
+        <NavItem to="/" icon={LayoutDashboard} collapsed={collapsed}>Operations Overview</NavItem>
 
-        <div className="mt-6">
-          {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Integrated modules</div>}
-          <div className="space-y-1">
-            {disabledModules.slice(0, 2).map(({ label, icon: Icon, code }) => (
-              <div key={label} title={`${label} — not connected in this frontend`} className="flex h-10 cursor-not-allowed items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/35">
-                <Icon size={18} className="shrink-0" />
-                {!collapsed && <><span className="min-w-0 flex-1 truncate">{label}</span><span className="font-mono text-[9px]">{code}</span></>}
-              </div>
-            ))}
-
-            <div className={`my-2 rounded-2xl border border-white/10 bg-white/[.06] ${collapsed ? 'p-1.5' : 'p-2'}`}>
-              {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Network Capacity</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 font-mono text-[9px] font-bold text-emerald-200">M03 LIVE</span></div>}
-              <div className="space-y-1">{networkLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
-            </div>
-
-            {disabledModules.slice(2).map(({ label, icon: Icon, code }) => (
-              <div key={label} title={`${label} — not connected in this frontend`} className="flex h-10 cursor-not-allowed items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/35">
-                <Icon size={18} className="shrink-0" />
-                {!collapsed && <><span className="min-w-0 flex-1 truncate">{label}</span><span className="font-mono text-[9px]">{code}</span></>}
-              </div>
-            ))}
-          </div>
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[.06] p-2">
+          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Tea Supply Network</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">LIVE</span></div>}
+          <div className="space-y-1">{networkLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
         </div>
 
         <div className="mt-6">
-          {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Evidence</div>}
-          <div title="Module 3 benchmarks are available inside Benchmarks" className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/45"><Gauge size={18} />{!collapsed && <span>Algorithm Performance</span>}</div>
+          {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Status</div>}
+          <div className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55"><Gauge size={18} />{!collapsed && <span>Network monitoring active</span>}</div>
         </div>
       </nav>
 
       <div className="border-t border-white/10 p-3">
-        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />Module 3 frontend</div><div className="mt-1 text-[10px] leading-4 text-white/45">Members 5 & 6 · Ford-Fulkerson + Bottleneck Analysis</div></div>}
+        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />Decision support ready</div><div className="mt-1 text-[10px] leading-4 text-white/45">Monitor daily capacity, critical routes and planned changes.</div></div>}
         <button onClick={onToggle} className="flex h-9 w-full items-center justify-center rounded-xl bg-white/[.07] text-white/65 hover:bg-white/10 hover:text-white" aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
         </button>

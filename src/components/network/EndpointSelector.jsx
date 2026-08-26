@@ -7,16 +7,16 @@ export function EndpointSelector({ nodes, sourceCode, sinkCode, onSourceChange, 
   const sinkOptions = sinks.length ? sinks : nodes.filter((n) => n.active)
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <Field label="Source node">
+      <Field label="Supply starting point">
         <select className={selectClass} value={sourceCode} onChange={(e) => onSourceChange(e.target.value)}>
-          <option value="">Select source</option>
-          {sourceOptions.map((node) => <option key={node.id} value={node.code}>{node.code} — {node.name}</option>)}
+          <option value="">Select supply origin</option>
+          {sourceOptions.map((location) => <option key={location.id} value={location.code}>{location.name} ({location.code})</option>)}
         </select>
       </Field>
-      <Field label="Factory / sink">
+      <Field label="Destination factory">
         <select className={selectClass} value={sinkCode} onChange={(e) => onSinkChange(e.target.value)}>
-          <option value="">Select sink</option>
-          {sinkOptions.map((node) => <option key={node.id} value={node.code}>{node.code} — {node.name}</option>)}
+          <option value="">Select factory</option>
+          {sinkOptions.map((location) => <option key={location.id} value={location.code}>{location.name} ({location.code})</option>)}
         </select>
       </Field>
     </div>

@@ -5,12 +5,12 @@ import { Topbar } from './Topbar'
 import { MobileNav } from './MobileNav'
 
 const titles = {
-  '/': 'Decision Center',
-  '/network': 'Network Flow Analysis',
-  '/network/bottlenecks': 'Bottleneck Analysis',
-  '/network/scenarios': 'Capacity Scenario Lab',
-  '/network/graph': 'Supply Graph Data',
-  '/network/benchmarks': 'Algorithm Benchmarks',
+  '/': 'Operations Overview',
+  '/network': 'Daily Tea Throughput',
+  '/network/bottlenecks': 'Critical Connections',
+  '/network/scenarios': 'What-If Capacity Planning',
+  '/network/graph': 'Supply Network Setup',
+  '/network/benchmarks': 'System Performance',
 }
 
 export function AppShell({ children }) {
