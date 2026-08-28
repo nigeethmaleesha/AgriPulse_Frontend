@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, Boxes, CheckCircle2, GitBranch, ShieldAlert, SlidersHorizontal } from 'lucide-react'
+import { Activity, ArrowRight, Boxes, CheckCircle2, GitBranch, ShieldAlert, SlidersHorizontal, Truck } from 'lucide-react'
 import { networkApi } from '../api/networkApi'
 import { apiErrorMessage } from '../api/client'
 import { useNetwork } from '../context/NetworkContext'
@@ -12,6 +12,12 @@ import { ErrorState, LoadingState } from '../components/ui/Feedback'
 import { NetworkGraph } from '../components/network/NetworkGraph'
 
 const actions = [
+  {
+    title: 'Urgent Tea Collection Dispatch (Port 8082)',
+    description: 'Calculate real-time shortest paths to high-priority harvest batches using Dijkstra + Max-Heap.',
+    to: '/dispatch',
+    icon: Truck,
+  },
   {
     title: 'Check daily delivery capacity',
     description: 'See how much tea the current transport network can deliver to the factory today.',
@@ -31,6 +37,7 @@ const actions = [
     icon: SlidersHorizontal,
   },
 ]
+
 
 export default function DashboardPage() {
   const { graph, loading, error, refreshGraph, apiOnline } = useNetwork()

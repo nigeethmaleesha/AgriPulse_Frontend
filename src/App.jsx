@@ -11,6 +11,9 @@ import BenchmarksPage from './pages/network/BenchmarksPage'
 import RiskRankingPage from './pages/spoilage/RiskRankingPage'
 import PriorityQueuePage from './pages/spoilage/PriorityQueuePage'
 import SpoilageBenchmarksPage from './pages/spoilage/SpoilageBenchmarksPage'
+import LiveDispatchPage from './pages/dispatch/LiveDispatchPage'
+import RouteCalculatorPage from './pages/dispatch/RouteCalculatorPage'
+import RoadControlPage from './pages/dispatch/RoadControlPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -20,6 +23,9 @@ export default function App() {
         <AppShell>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/dispatch" element={<LiveDispatchPage />} />
+            <Route path="/dispatch/calculator" element={<RouteCalculatorPage />} />
+            <Route path="/dispatch/roads" element={<RoadControlPage />} />
             <Route path="/network" element={<FlowAnalysisPage />} />
             <Route path="/network/bottlenecks" element={<BottlenecksPage />} />
             <Route path="/network/scenarios" element={<ScenarioLabPage />} />
@@ -35,3 +41,4 @@ export default function App() {
     </NetworkProvider>
   )
 }
+
