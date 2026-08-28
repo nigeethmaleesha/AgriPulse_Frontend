@@ -11,6 +11,9 @@ const titles = {
   '/network/scenarios': 'What-If Capacity Planning',
   '/network/graph': 'Supply Network Setup',
   '/network/benchmarks': 'System Performance',
+  '/spoilage': 'Harvest Batch Risk Ranking',
+  '/spoilage/priority': 'Live Urgent Batch Queue',
+  '/spoilage/benchmarks': 'Spoilage Algorithm Performance',
 }
 
 export function AppShell({ children }) {

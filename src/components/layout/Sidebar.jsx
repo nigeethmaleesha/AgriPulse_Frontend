@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   Activity, Boxes, ChevronLeft, ChevronRight, Gauge, GitBranch,
-  LayoutDashboard, Leaf, Network, TestTube2
+  LayoutDashboard, Leaf, ListOrdered, Network, ShieldAlert, TestTube2, ThermometerSun
 } from 'lucide-react'
 
 const networkLinks = [
@@ -12,11 +12,17 @@ const networkLinks = [
   { to: '/network/benchmarks', label: 'System Performance', icon: TestTube2 },
 ]
 
+const spoilageLinks = [
+  { to: '/spoilage', label: 'Risk Ranking', icon: ThermometerSun },
+  { to: '/spoilage/priority', label: 'Live Priority Queue', icon: ListOrdered },
+  { to: '/spoilage/benchmarks', label: 'Algorithm Comparison', icon: TestTube2 },
+]
+
 function NavItem({ to, icon: Icon, children, collapsed }) {
   return (
     <NavLink
       to={to}
-      end={to === '/'}
+      end={to === '/' || to === '/network' || to === '/spoilage'}
       className={({ isActive }) => `group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive ? 'bg-white text-tea-950 shadow-sm' : 'text-white/72 hover:bg-white/8 hover:text-white'}`}
     >
       <Icon size={18} className="shrink-0" />
@@ -40,18 +46,23 @@ export function Sidebar({ collapsed, onToggle }) {
         <NavItem to="/" icon={LayoutDashboard} collapsed={collapsed}>Operations Overview</NavItem>
 
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/[.06] p-2">
-          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Tea Supply Network</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">LIVE</span></div>}
+          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Tea Supply Network</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">M03 · LIVE</span></div>}
           <div className="space-y-1">{networkLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
+        </div>
+
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.06] p-2">
+          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Spoilage Intelligence</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">M04 · LIVE</span></div>}
+          <div className="space-y-1">{spoilageLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
         </div>
 
         <div className="mt-6">
           {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/40">Status</div>}
-          <div className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55"><Gauge size={18} />{!collapsed && <span>Network monitoring active</span>}</div>
+          <div className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55"><Gauge size={18} />{!collapsed && <span>Decision modules active</span>}</div>
         </div>
       </nav>
 
       <div className="border-t border-white/10 p-3">
-        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />Decision support ready</div><div className="mt-1 text-[10px] leading-4 text-white/45">Monitor daily capacity, critical routes and planned changes.</div></div>}
+        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />Decision support ready</div><div className="mt-1 text-[10px] leading-4 text-white/45">Module 3 network analysis and Module 4 spoilage intelligence are connected to their backend services.</div></div>}
         <button onClick={onToggle} className="flex h-9 w-full items-center justify-center rounded-xl bg-white/[.07] text-white/65 hover:bg-white/10 hover:text-white" aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
         </button>
