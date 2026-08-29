@@ -14,6 +14,7 @@ const titles = {
   '/spoilage': 'Harvest Batch Risk Ranking',
   '/spoilage/priority': 'Live Urgent Batch Queue',
   '/spoilage/benchmarks': 'Spoilage Algorithm Performance',
+  '/scheduling': 'Factory Shift Scheduler',
 }
 
 export function AppShell({ children }) {

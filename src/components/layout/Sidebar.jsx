@@ -1,8 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import {
-  Activity, Boxes, Calculator, ChevronLeft, ChevronRight, Gauge, GitBranch,
+  Activity, Boxes, Calculator, ChevronLeft, ChevronRight, ClipboardList, Gauge, GitBranch,
   LayoutDashboard, Leaf, ListOrdered, Network, ShieldAlert, TestTube2, ThermometerSun, Truck
 } from 'lucide-react'
+
+const schedulingLinks = [
+  { to: '/scheduling', label: 'Shift Scheduler', icon: ClipboardList },
+]
 
 const networkLinks = [
   { to: '/network', label: 'Daily Throughput', icon: Network },
@@ -28,7 +32,7 @@ function NavItem({ to, icon: Icon, children, collapsed }) {
   return (
     <NavLink
       to={to}
-      end={to === '/' || to === '/network' || to === '/spoilage' || to === '/dispatch'}
+      end={to === '/' || to === '/network' || to === '/spoilage' || to === '/dispatch' || to === '/scheduling'}
       className={({ isActive }) => `group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive ? 'bg-white text-tea-950 shadow-sm' : 'text-white/72 hover:bg-white/8 hover:text-white'}`}
     >
       <Icon size={18} className="shrink-0" />
@@ -64,6 +68,11 @@ export function Sidebar({ collapsed, onToggle }) {
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.06] p-2">
           {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Spoilage Intelligence</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">M04 · LIVE</span></div>}
           <div className="space-y-1">{spoilageLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
+        </div>
+
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.06] p-2">
+          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Factory Processing</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">M05 · LIVE</span></div>}
+          <div className="space-y-1">{schedulingLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
         </div>
 
         <div className="mt-6">
