@@ -15,6 +15,7 @@ const titles = {
   '/spoilage/priority': 'Live Urgent Batch Queue',
   '/spoilage/benchmarks': 'Spoilage Algorithm Performance',
   '/scheduling': 'Factory Shift Scheduler',
+  '/scheduling/benchmarks': 'Scheduling Algorithm Performance',
 }
 
 export function AppShell({ children }) {

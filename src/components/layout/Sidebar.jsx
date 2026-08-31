@@ -6,6 +6,7 @@ import {
 
 const schedulingLinks = [
   { to: '/scheduling', label: 'Shift Scheduler', icon: ClipboardList },
+  { to: '/scheduling/benchmarks', label: 'Algorithm Performance', icon: TestTube2 },
 ]
 
 const networkLinks = [

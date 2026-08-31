@@ -16,6 +16,7 @@ import LiveDispatchPage from './pages/dispatch/LiveDispatchPage'
 import RouteCalculatorPage from './pages/dispatch/RouteCalculatorPage'
 import RoadControlPage from './pages/dispatch/RoadControlPage'
 import FactorySchedulingPage from './pages/scheduling/FactorySchedulingPage'
+import SchedulingBenchmarksPage from './pages/scheduling/SchedulingBenchmarksPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/spoilage/priority" element={<PriorityQueuePage />} />
               <Route path="/spoilage/benchmarks" element={<SpoilageBenchmarksPage />} />
               <Route path="/scheduling" element={<FactorySchedulingPage />} />
+              <Route path="/scheduling/benchmarks" element={<SchedulingBenchmarksPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AppShell>

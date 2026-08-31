@@ -74,11 +74,6 @@ export function SchedulingProvider({ children }) {
   const machineActions = useMemo(() => makeListActions(setMachines, 'machineId'), [])
   const outageActions = useMemo(() => makeListActions(setOutages, 'outageId'), [])
 
-  const loadSampleData = useCallback(() => {
-    setTasks(sampleTasks()); setWorkers(sampleWorkers()); setMachines(sampleMachines()); setOutages(sampleOutages())
-    setResult(null); setRunError('')
-  }, [])
-
   const clearAll = useCallback(() => {
     setTasks([]); setWorkers([]); setMachines([]); setOutages([])
     setResult(null); setRunError('')
@@ -101,10 +96,10 @@ export function SchedulingProvider({ children }) {
   const value = useMemo(() => ({
     tasks, workers, machines, outages,
     taskActions, workerActions, machineActions, outageActions,
-    loadSampleData, clearAll,
+    clearAll,
     result, running, runError, runSchedule,
   }), [tasks, workers, machines, outages, taskActions, workerActions, machineActions, outageActions,
-      loadSampleData, clearAll, result, running, runError, runSchedule])
+      clearAll, result, running, runError, runSchedule])
 
   return <SchedulingContext.Provider value={value}>{children}</SchedulingContext.Provider>
 }

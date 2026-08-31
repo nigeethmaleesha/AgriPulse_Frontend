@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  Boxes, ClipboardList, Edit3, Play, Plus, RotateCcw, Trash2, Users, Zap, ZapOff,
+  Boxes, ClipboardList, Edit3, Play, Plus, Trash2, Users, Zap, ZapOff,
   Gauge, Trophy, Scale, Timer, TrendingUp,
 } from 'lucide-react'
 import { useScheduling } from '../../context/SchedulingContext'
@@ -168,7 +168,7 @@ function PlanCard({ title, badgeTone, planResult }) {
 export default function FactorySchedulingPage() {
   const {
     tasks, workers, machines, outages, taskActions, workerActions, machineActions, outageActions,
-    loadSampleData, clearAll, result, running, runError, runSchedule,
+    clearAll, result, running, runError, runSchedule,
   } = useScheduling()
 
   const [tab, setTab] = useState('tasks')
@@ -208,7 +208,7 @@ export default function FactorySchedulingPage() {
       engine="SHIFT SCHEDULE OPTIMIZATION"
       title="Factory Processing & Worker Shift Scheduler"
       description="Set up today's production tasks, workers, machines and any power outage windows, then generate an optimized shift schedule. Two independent optimization strategies are run and compared so you can see how much they agree."
-      action={<div className="flex gap-2"><Button variant="secondary" size="sm" onClick={clearAll}><Trash2 size={15} /> Clear All</Button><Button variant="secondary" size="sm" onClick={loadSampleData}><RotateCcw size={15} /> Load Sample Data</Button></div>}
+      action={<Button variant="secondary" size="sm" onClick={clearAll}><Trash2 size={15} /> Clear All</Button>}
     />
 
     <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
