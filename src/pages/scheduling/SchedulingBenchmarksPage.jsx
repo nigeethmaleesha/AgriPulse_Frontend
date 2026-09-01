@@ -62,35 +62,35 @@ export default function SchedulingBenchmarksPage() {
     if (!rows.length) return null
     return rows.reduce((best, r) => {
       const rowBest = Math.min(r.geneticExecutionTimeMs, r.annealingExecutionTimeMs)
-      return !best || rowBest < best.timeMs ? { timeMs: rowBest, method: r.geneticExecutionTimeMs <= r.annealingExecutionTimeMs ? 'Genetic Algorithm' : 'Simulated Annealing', taskCount: r.taskCount } : best
+      return !best || rowBest < best.timeMs ? { timeMs: rowBest, taskCount: r.taskCount } : best
     }, null)
   }, [rows])
   const avgDifference = useMemo(() => rows.length ? rows.reduce((sum, r) => sum + r.differencePercent, 0) / rows.length : null, [rows])
 
-  const timeChartData = useMemo(() => rows.map((r) => ({ taskCount: r.taskCount, 'Genetic Algorithm': r.geneticExecutionTimeMs, 'Simulated Annealing': r.annealingExecutionTimeMs })), [rows])
+  const timeChartData = useMemo(() => rows.map((r) => ({ taskCount: r.taskCount, 'Primary Strategy': r.geneticExecutionTimeMs, 'Alternative Strategy': r.annealingExecutionTimeMs })), [rows])
   const valueChartData = useMemo(() => rows.map((r) => ({ taskCount: r.taskCount, genetic: r.geneticTotalValue, annealing: r.annealingTotalValue })), [rows])
 
   return <>
-    <PageHeader module="FACTORY PROCESSING" engine="ADMINISTRATOR VIEW" title="Scheduling Algorithm Performance" description="Run the actual Genetic Algorithm and Simulated Annealing schedulers on synthetically generated task/worker/machine scenarios and compare calculation time and schedule quality as the task count grows." />
+    <PageHeader module="FACTORY OPERATIONS" engine="PERFORMANCE INSIGHTS" title="Scheduling Performance" description="Review calculation time and schedule quality across different production workload sizes." />
 
     <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <MetricTile label="Runs in this session" value={rows.length} icon={BarChart3} caption="Task-count scenarios measured so far" />
       <MetricTile label="Largest task count tested" value={largest || '—'} icon={Gauge} />
-      <MetricTile label="Fastest measured run" value={fastestOverall ? fastestOverall.timeMs.toFixed(2) : '—'} suffix={fastestOverall ? 'ms' : ''} icon={Timer} caption={fastestOverall ? `${fastestOverall.method} · ${fastestOverall.taskCount} tasks` : 'Run a benchmark to compare'} />
-      <MetricTile label="Average plan difference" value={avgDifference != null ? `${avgDifference.toFixed(1)}%` : '—'} icon={Scale} caption="How far apart GA and SA plans land, on average" />
+      <MetricTile label="Fastest measured run" value={fastestOverall ? fastestOverall.timeMs.toFixed(2) : '—'} suffix={fastestOverall ? 'ms' : ''} icon={Timer} caption={fastestOverall ? `${fastestOverall.taskCount} production tasks` : 'Run a performance review to compare'} />
+      <MetricTile label="Average plan difference" value={avgDifference != null ? `${avgDifference.toFixed(1)}%` : '—'} icon={Scale} caption="Average quality difference between the two planning strategies" />
     </div>
 
     <Panel className="mb-6 overflow-hidden">
-      <PanelHeader eyebrow="Benchmark setup" title="Run Synthetic Scaling Test" description="Each task count generates a fresh synthetic scenario (tasks, workers, machines, outages) and runs both optimizers on it. Results accumulate below so you can compare several sizes." />
+      <PanelHeader eyebrow="Performance setup" title="Review Different Workload Sizes" description="Each task count creates a controlled production scenario so response time and plan quality can be compared consistently." />
       <div className="p-5">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
           <Field label="Task counts to test" hint="Comma-separated positive numbers.">
             <input className={inputClass} value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="10, 30, 80" disabled={loading} />
           </Field>
-          <Button onClick={run} disabled={running || loading}><Play size={15} /> {running ? 'Running benchmark…' : 'Run Benchmark'}</Button>
+          <Button onClick={run} disabled={running || loading}><Play size={15} /> {running ? 'Preparing insights…' : 'Run Performance Review'}</Button>
         </div>
         {presets.length > 0 && <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted">
-          <span className="font-bold text-graphite">Coursework presets:</span>
+          <span className="font-bold text-graphite">Workload presets:</span>
           {presets.map((p) => <button key={p} onClick={() => toggleSize(p)} className={`rounded-lg border px-2.5 py-1.5 font-semibold transition ${parseSizes(sizes).includes(p) ? 'border-tea-700 bg-tea-50 text-tea-900' : 'border-tea-950/10 bg-white hover:bg-tea-50/50'}`}>{p} tasks</button>)}
         </div>}
         {error && <div className="mt-4"><InlineError message={error} /></div>}
@@ -99,18 +99,18 @@ export default function SchedulingBenchmarksPage() {
 
     {rows.length > 0 && <div className="mb-6 grid gap-6 xl:grid-cols-2">
       <Panel className="overflow-hidden">
-        <PanelHeader eyebrow="Time efficiency" title="Calculation Time vs Task Count" description="Measured by the Java backend for each optimizer; lower is faster." />
-        <div className="h-[320px] p-4"><ResponsiveContainer width="100%" height="100%"><LineChart data={timeChartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="taskCount" tick={{ fontSize: 11 }} label={{ value: 'tasks', position: 'insideBottom', offset: -3 }} /><YAxis tick={{ fontSize: 11 }} label={{ value: 'ms', angle: -90, position: 'insideLeft' }} /><Tooltip /><Legend /><Line type="monotone" dataKey="Genetic Algorithm" stroke="#123D32" strokeWidth={2.5} dot={{ r: 3 }} /><Line type="monotone" dataKey="Simulated Annealing" stroke="#C58A2C" strokeWidth={2.5} dot={{ r: 3 }} /></LineChart></ResponsiveContainer></div>
+        <PanelHeader eyebrow="Time efficiency" title="Calculation Time vs Task Count" description="Measured by the connected scheduling service for each planning strategy; lower is faster." />
+        <div className="h-[320px] p-4"><ResponsiveContainer width="100%" height="100%"><LineChart data={timeChartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="taskCount" tick={{ fontSize: 11 }} label={{ value: 'tasks', position: 'insideBottom', offset: -3 }} /><YAxis tick={{ fontSize: 11 }} label={{ value: 'ms', angle: -90, position: 'insideLeft' }} /><Tooltip /><Legend /><Line type="monotone" dataKey="Primary Strategy" stroke="#123D32" strokeWidth={2.5} dot={{ r: 3 }} /><Line type="monotone" dataKey="Alternative Strategy" stroke="#C58A2C" strokeWidth={2.5} dot={{ r: 3 }} /></LineChart></ResponsiveContainer></div>
       </Panel>
       <Panel className="overflow-hidden">
         <PanelHeader eyebrow="Solution quality" title="Total Priority Value vs Task Count" description="Higher means more (and higher-priority) tasks were successfully placed into the schedule." />
-        <div className="h-[320px] p-4"><ResponsiveContainer width="100%" height="100%"><BarChart data={valueChartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="taskCount" tick={{ fontSize: 11 }} label={{ value: 'tasks', position: 'insideBottom', offset: -3 }} /><YAxis tick={{ fontSize: 11 }} /><Tooltip /><Legend formatter={(v) => v === 'genetic' ? 'Genetic Algorithm' : 'Simulated Annealing'} /><Bar dataKey="genetic" fill="#123D32" radius={[5,5,0,0]} name="genetic" /><Bar dataKey="annealing" fill="#C58A2C" radius={[5,5,0,0]} name="annealing" /></BarChart></ResponsiveContainer></div>
+        <div className="h-[320px] p-4"><ResponsiveContainer width="100%" height="100%"><BarChart data={valueChartData}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e7e3" /><XAxis dataKey="taskCount" tick={{ fontSize: 11 }} label={{ value: 'tasks', position: 'insideBottom', offset: -3 }} /><YAxis tick={{ fontSize: 11 }} /><Tooltip /><Legend formatter={(v) => v === 'genetic' ? 'Primary Strategy' : 'Alternative Strategy'} /><Bar dataKey="genetic" fill="#123D32" radius={[5,5,0,0]} name="genetic" /><Bar dataKey="annealing" fill="#C58A2C" radius={[5,5,0,0]} name="annealing" /></BarChart></ResponsiveContainer></div>
       </Panel>
     </div>}
 
     <Panel className="overflow-hidden">
-      <PanelHeader eyebrow="Measured evidence" title="Benchmark Results" description="These values are returned directly by the backend for each synthetic scenario. No numbers are generated in the frontend." />
-      {rows.length ? <DataTableShell><table className="min-w-[1040px] w-full text-left text-sm"><thead className="bg-tea-50/75 text-[11px] uppercase tracking-[.08em] text-muted"><tr><th className="px-4 py-3">Tasks</th><th className="px-4 py-3">Workers</th><th className="px-4 py-3">Machines</th><th className="px-4 py-3">GA time</th><th className="px-4 py-3">SA time</th><th className="px-4 py-3">GA value</th><th className="px-4 py-3">SA value</th><th className="px-4 py-3">GA placed</th><th className="px-4 py-3">SA placed</th><th className="px-4 py-3">Better plan</th></tr></thead><tbody className="divide-y divide-tea-950/7">{rows.map((r) => { const better = betterMethod(r); return <tr key={r.taskCount} className="hover:bg-tea-50/35"><td className="px-4 py-3 font-mono font-bold">{r.taskCount}</td><td className="px-4 py-3 font-mono">{r.workerCount}</td><td className="px-4 py-3 font-mono">{r.machineCount}</td><td className="px-4 py-3 font-mono">{r.geneticExecutionTimeMs.toFixed(3)} ms</td><td className="px-4 py-3 font-mono">{r.annealingExecutionTimeMs.toFixed(3)} ms</td><td className="px-4 py-3 font-mono">{r.geneticTotalValue}</td><td className="px-4 py-3 font-mono">{r.annealingTotalValue}</td><td className="px-4 py-3 font-mono">{r.geneticTasksScheduled}/{r.taskCount}</td><td className="px-4 py-3 font-mono">{r.annealingTasksScheduled}/{r.taskCount}</td><td className="px-4 py-3"><Badge tone={better === 'TIE' ? 'neutral' : 'green'}>{better === 'TIE' ? 'Tie' : better === 'GENETIC_ALGORITHM' ? 'Genetic Algorithm' : 'Simulated Annealing'} · {r.differencePercent.toFixed(1)}%</Badge></td></tr> })}</tbody></table></DataTableShell> : <EmptyState title="No benchmark runs yet" description="Choose task counts above and run the benchmark to create measured performance evidence." icon={Activity} />}
+      <PanelHeader eyebrow="Measured results" title="Performance Results" description="These measurements are returned directly by the scheduling service for each controlled workload." />
+      {rows.length ? <DataTableShell><table className="min-w-[1040px] w-full text-left text-sm"><thead className="bg-tea-50/75 text-[11px] uppercase tracking-[.08em] text-muted"><tr><th className="px-4 py-3">Tasks</th><th className="px-4 py-3">Workers</th><th className="px-4 py-3">Machines</th><th className="px-4 py-3">Primary time</th><th className="px-4 py-3">Alternative time</th><th className="px-4 py-3">Primary value</th><th className="px-4 py-3">Alternative value</th><th className="px-4 py-3">Primary placed</th><th className="px-4 py-3">Alternative placed</th><th className="px-4 py-3">Better plan</th></tr></thead><tbody className="divide-y divide-tea-950/7">{rows.map((r) => { const better = betterMethod(r); return <tr key={r.taskCount} className="hover:bg-tea-50/35"><td className="px-4 py-3 font-mono font-bold">{r.taskCount}</td><td className="px-4 py-3 font-mono">{r.workerCount}</td><td className="px-4 py-3 font-mono">{r.machineCount}</td><td className="px-4 py-3 font-mono">{r.geneticExecutionTimeMs.toFixed(3)} ms</td><td className="px-4 py-3 font-mono">{r.annealingExecutionTimeMs.toFixed(3)} ms</td><td className="px-4 py-3 font-mono">{r.geneticTotalValue}</td><td className="px-4 py-3 font-mono">{r.annealingTotalValue}</td><td className="px-4 py-3 font-mono">{r.geneticTasksScheduled}/{r.taskCount}</td><td className="px-4 py-3 font-mono">{r.annealingTasksScheduled}/{r.taskCount}</td><td className="px-4 py-3"><Badge tone={better === 'TIE' ? 'neutral' : 'green'}>{better === 'TIE' ? 'Tie' : better === 'GENETIC_ALGORITHM' ? 'Primary Strategy' : 'Alternative Strategy'} · {r.differencePercent.toFixed(1)}%</Badge></td></tr> })}</tbody></table></DataTableShell> : <EmptyState title="No performance runs yet" description="Choose task counts above and run the performance review to create measured results." icon={Activity} />}
     </Panel>
   </>
 }

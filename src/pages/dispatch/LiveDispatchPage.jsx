@@ -100,10 +100,10 @@ export default function LiveDispatchPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        module="DISPATCH & ROUTE ENGINE · PORT 8082"
-        engine="Max-Heap Priority + Dijkstra Routing"
-        title="Live Dispatch & Emergency Route Center"
-        description="Dynamic tea collection routing targeting the highest priority ready harvest batches using PostgreSQL live road conditions and shortest-path calculation."
+        module="COLLECTION & DISPATCH"
+        engine="LIVE ROUTE GUIDANCE"
+        title="Dispatch Control Centre"
+        description="Coordinate tea collection vehicles using current batch urgency, road availability, and the most practical route to each destination."
         action={
           <div className="flex items-center gap-3">
             <Button
@@ -112,7 +112,7 @@ export default function LiveDispatchPage() {
               disabled={seeding || loading}
             >
               <Database size={15} className={`mr-2 ${seeding ? 'animate-spin' : ''}`} />
-              {seeding ? 'Seeding DB...' : 'Reset / Seed Database'}
+              {seeding ? 'Preparing data…' : 'Reset Demo Data'}
             </Button>
             <Button
               onClick={() => fetchRoute(truckNode)}
@@ -157,7 +157,7 @@ export default function LiveDispatchPage() {
           tone="green"
         />
         <MetricTile
-          label="Optimal Route Cost"
+          label="Recommended Route Cost"
           value={hasRoute ? cost.toFixed(2) : 'Unreachable'}
           suffix={hasRoute ? 'weighted cost' : ''}
           caption={hasRoute ? `${path.length} nodes in optimal path` : 'Road network inaccessible'}
@@ -171,7 +171,7 @@ export default function LiveDispatchPage() {
         <div className="space-y-6 lg:col-span-2">
           <Panel
             title="Live Route Computation & Dispatch Guidance"
-            action={<Badge tone="green">Port 8082 Active</Badge>}
+            action={<Badge tone="green">Dispatch service active</Badge>}
           >
             {/* Truck Position Controller */}
             <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
@@ -213,7 +213,7 @@ export default function LiveDispatchPage() {
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
                     <h4 className="text-sm font-bold uppercase tracking-wider text-graphite">
-                      Recommended Shortest Path (Dijkstra Min-Heap)
+                      Recommended Collection Route
                     </h4>
                     <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
                       Total Cost: {cost.toFixed(2)}
@@ -334,23 +334,23 @@ export default function LiveDispatchPage() {
             </div>
           </Panel>
 
-          <Panel title="Algorithm Execution Specs">
+          <Panel title="Dispatch Service Details">
             <div className="space-y-3 text-xs text-graphite">
               <div className="flex justify-between border-b border-slate-100 pb-2">
-                <span className="text-muted">Target Selection Algorithm</span>
-                <span className="font-bold text-tea-900">Max-Heap Priority Queue</span>
+                <span className="text-muted">Batch selection</span>
+                <span className="font-bold text-tea-900">Urgency-based priority</span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-2">
-                <span className="text-muted">Shortest Path Engine</span>
-                <span className="font-bold text-tea-900">Dijkstra Min-Heap</span>
+                <span className="text-muted">Route guidance</span>
+                <span className="font-bold text-tea-900">Lowest-cost available route</span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-2">
-                <span className="text-muted">Database Engine</span>
-                <span className="font-bold text-tea-900">PostgreSQL (agripulse_module1_dispatch)</span>
+                <span className="text-muted">Operational data</span>
+                <span className="font-bold text-tea-900">Live dispatch records</span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-2">
-                <span className="text-muted">Backend Service</span>
-                <span className="font-bold text-emerald-600">Port 8082</span>
+                <span className="text-muted">Service status</span>
+                <span className="font-bold text-emerald-600">Connected</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Road Penalty Formula</span>

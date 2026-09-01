@@ -86,14 +86,14 @@ export default function RouteCalculatorPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        module="DISPATCH ENGINE · PLAYGROUND"
-        engine="POST /api/v1/dispatch/calculate-route"
-        title="In-Memory Route Calculator & Payload Inspector"
-        description="Test custom harvest batch priorities and road graph edge weights to simulate exact Dijkstra + Max-Heap algorithm responses."
+        module="COLLECTION & DISPATCH"
+        engine="ROUTE PLANNING"
+        title="Collection Route Planner"
+        description="Compare collection priorities and road conditions to prepare a practical route before dispatching a vehicle."
         action={
           <Button onClick={handleRunCalculation} disabled={loading}>
             <Play size={16} className="mr-2" />
-            {loading ? 'Calculating...' : 'Run Route Calculation'}
+            {loading ? 'Calculating…' : 'Calculate Route'}
           </Button>
         }
       />
@@ -110,10 +110,10 @@ export default function RouteCalculatorPage() {
         {/* Left: Input Payload Designer */}
         <div className="space-y-6 lg:col-span-2">
           {/* Truck Start Node */}
-          <Panel title="1. Truck Starting Position">
+          <Panel title="1. Vehicle Starting Position">
             <div className="flex items-center gap-4">
               <label className="text-xs font-bold uppercase tracking-wider text-graphite">
-                Truck Current Node:
+                Current location:
               </label>
               <select
                 value={truckCurrentNode}
@@ -129,7 +129,7 @@ export default function RouteCalculatorPage() {
 
           {/* Harvest Batches List */}
           <Panel
-            title="2. Ready Harvest Batches (Max-Heap Input)"
+            title="2. Ready Harvest Batches"
             action={
               <Button variant="outline" size="sm" onClick={handleAddBatch}>
                 <Plus size={14} className="mr-1" /> Add Batch
@@ -195,7 +195,7 @@ export default function RouteCalculatorPage() {
 
         {/* Right: Output Inspection Panel */}
         <div className="space-y-6">
-          <Panel title="Calculated Route Output">
+          <Panel title="Recommended Route">
             {calcResult ? (
               <div className="space-y-4">
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">

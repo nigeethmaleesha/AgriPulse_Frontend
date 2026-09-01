@@ -205,9 +205,9 @@ export default function FactorySchedulingPage() {
   return <>
     <PageHeader
       module="FACTORY PROCESSING"
-      engine="SHIFT SCHEDULE OPTIMIZATION"
-      title="Factory Processing & Worker Shift Scheduler"
-      description="Set up today's production tasks, workers, machines and any power outage windows, then generate an optimized shift schedule. Two independent optimization strategies are run and compared so you can see how much they agree."
+      engine="DAILY PRODUCTION PLAN"
+      title="Factory Shift Planning"
+      description="Organize today&apos;s production tasks, available workers, machines, and power interruptions, then prepare a practical factory schedule."
       action={<Button variant="secondary" size="sm" onClick={clearAll}><Trash2 size={15} /> Clear All</Button>}
     />
 
@@ -249,17 +249,17 @@ export default function FactorySchedulingPage() {
     {result && (
       <>
         <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricTile label="Evolutionary plan value" value={result.geneticResult.totalPriorityValue} icon={Gauge} caption={`${result.geneticResult.tasksScheduled} of ${result.geneticResult.tasksTotal} tasks placed`} />
-          <MetricTile label="Annealing plan value" value={result.annealingResult.totalPriorityValue} icon={Trophy} tone="green" caption={`${result.annealingResult.tasksScheduled} of ${result.annealingResult.tasksTotal} tasks placed`} />
+          <MetricTile label="Primary plan value" value={result.geneticResult.totalPriorityValue} icon={Gauge} caption={`${result.geneticResult.tasksScheduled} of ${result.geneticResult.tasksTotal} tasks placed`} />
+          <MetricTile label="Alternative plan value" value={result.annealingResult.totalPriorityValue} icon={Trophy} tone="green" caption={`${result.annealingResult.tasksScheduled} of ${result.annealingResult.tasksTotal} tasks placed`} />
           <MetricTile label="Difference between plans" value={`${result.differencePercent.toFixed(1)}%`} icon={Scale} tone={result.betterMethod === 'TIE' ? 'green' : 'amber'} caption="How far apart the two strategies landed" />
-          <MetricTile label="Calculation time" value={`${result.geneticResult.executionTimeMs.toFixed(1)} / ${result.annealingResult.executionTimeMs.toFixed(1)}`} suffix="ms" icon={Timer} caption="Evolutionary vs. annealing calculation time" />
+          <MetricTile label="Calculation time" value={`${result.geneticResult.executionTimeMs.toFixed(1)} / ${result.annealingResult.executionTimeMs.toFixed(1)}`} suffix="ms" icon={Timer} caption="Primary vs. alternative planning time" />
         </div>
 
         <FeedbackBanner type={result.betterMethod === 'TIE' ? 'success' : 'info'} message={result.verdict} />
 
         <div className="mt-6 grid gap-6 xl:grid-cols-2">
-          <PlanCard title="Evolutionary Plan" badgeTone="neutral" planResult={result.geneticResult} />
-          <PlanCard title="Simulated Annealing Plan" badgeTone="green" planResult={result.annealingResult} />
+          <PlanCard title="Primary Production Plan" badgeTone="neutral" planResult={result.geneticResult} />
+          <PlanCard title="Alternative Production Plan" badgeTone="green" planResult={result.annealingResult} />
         </div>
       </>
     )}

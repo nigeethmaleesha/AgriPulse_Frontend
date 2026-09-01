@@ -9,6 +9,13 @@ import { Panel, PanelHeader } from '../../components/ui/Panel'
 import { Field, inputClass, selectClass } from '../../components/ui/FormControls'
 import { ErrorState, LoadingState } from '../../components/ui/Feedback'
 
+function strategyLabel(value = '') {
+  if (value.includes('Max-Heap')) return 'Recommended Priority Strategy'
+  if (value.includes('Full Sort')) return 'Full Review Strategy'
+  if (value.includes('Greedy')) return 'First-Ready Strategy'
+  return value || 'Planning Strategy'
+}
+
 export default function PumpAllocationPage() {
   const { pumpBenchmark, runPumpBenchmark, backendConnected } = useAllocation()
 
@@ -69,15 +76,15 @@ export default function PumpAllocationPage() {
       <div className="topographic relative mb-6 overflow-hidden rounded-[26px] px-6 py-7 text-white shadow-soft sm:px-8 sm:py-8">
         <div className="relative z-10 max-w-3xl">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge tone="green" className="!bg-white/12 !text-emerald-100">TASK 2B · MEMBER 4</Badge>
-            <Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">MAX-HEAP PRIORITY QUEUE</Badge>
+            <Badge tone="green" className="!bg-white/12 !text-emerald-100">RESOURCE PLANNING</Badge>
+            <Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">NEED-BASED PRIORITIZATION</Badge>
             <Badge tone={backendConnected ? 'green' : 'red'} className="!bg-black/20">
-              {backendConnected ? 'MODULE 2 BACKEND · LIVE' : 'BACKEND DISCONNECTED'}
+              {backendConnected ? 'LIVE DATA CONNECTED' : 'SERVICE UNAVAILABLE'}
             </Badge>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Irrigation Pump Resource Allocation</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Irrigation Resource Planning</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
-            Priority-based allocation of high-capacity water pumps to smallholder tea farms during dry seasons using a custom Max-Heap Priority Queue.
+            Direct limited irrigation pumps to the farms with the greatest current need during dry-season operations.
           </p>
 
           {/* Navigation Tabs */}
@@ -90,7 +97,7 @@ export default function PumpAllocationPage() {
                   : 'bg-white/10 text-white hover:bg-white/15'
               }`}
             >
-              <Zap size={15} /> Max-Heap Allocation
+              <Zap size={15} /> Pump Allocation
             </button>
 
             <button
@@ -112,7 +119,7 @@ export default function PumpAllocationPage() {
                   : 'bg-white/10 text-white hover:bg-white/15'
               }`}
             >
-              <BarChart3 size={15} /> Algorithm Comparison Lab
+              <BarChart3 size={15} /> Performance Insights
             </button>
           </div>
         </div>
@@ -125,9 +132,9 @@ export default function PumpAllocationPage() {
           {/* Controls Panel */}
           <Panel className="mb-6 p-6">
             <PanelHeader
-              eyebrow="Simulation Setup"
-              title="Run Max-Heap Pump Priority Allocation"
-              description="Configure farm dataset size and pump supply limit to execute O(N log K) priority allocation."
+              eyebrow="Planning setup"
+              title="Create Irrigation Allocation Plan"
+              description="Enter the number of farms requiring support and the pumps currently available."
               action={
                 <Button variant="secondary" size="sm" onClick={() => handleRun()} disabled={running}>
                   <RefreshCw size={14} className={running ? 'animate-spin' : ''} /> Refresh Simulation
@@ -149,33 +156,9 @@ export default function PumpAllocationPage() {
                 </Field>
               </div>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.09em] text-muted">Quick Simulation Presets</label>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { farms: 50, pumps: 5 },
-                    { farms: 200, pumps: 20 },
-                    { farms: 2000, pumps: 50 },
-                  ].map((preset) => (
-                    <button
-                      key={preset.farms}
-                      type="button"
-                      onClick={() => {
-                        setNumberOfFarms(preset.farms)
-                        setAvailablePumps(preset.pumps)
-                        handleRun(preset.farms, preset.pumps)
-                      }}
-                      className={`rounded-lg px-3 py-2 text-xs font-bold transition ${
-                        Number(numberOfFarms) === preset.farms
-                          ? 'bg-tea-800 text-white'
-                          : 'bg-tea-50 text-tea-950 hover:bg-tea-100'
-                      }`}
-                    >
-                      {preset.farms} Farms / {preset.pumps} Pumps
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <Field label="Available Irrigation Pumps">
+                <input type="number" min="1" max="1000" className={inputClass} value={availablePumps} onChange={(e) => setAvailablePumps(e.target.value)} />
+              </Field>
 
               <div>
                 <Button
@@ -185,10 +168,10 @@ export default function PumpAllocationPage() {
                   disabled={running}
                 >
                   {running ? (
-                    'Executing Max-Heap Queue...'
+                    'Preparing Allocation Plan…'
                   ) : (
                     <>
-                      <Play size={16} /> Run Max-Heap Simulation
+                      <Play size={16} /> Create Allocation Plan
                     </>
                   )}
                 </Button>
@@ -205,7 +188,7 @@ export default function PumpAllocationPage() {
 
           {/* KPI Tiles */}
           {running ? (
-            <Panel className="p-12"><LoadingState message="Executing Max-Heap priority queue allocation..." /></Panel>
+            <Panel className="p-12"><LoadingState message="Preparing the irrigation allocation plan…" /></Panel>
           ) : (
             pumpBenchmark.length > 0 && (
               <>
@@ -224,18 +207,18 @@ export default function PumpAllocationPage() {
                     tone="green"
                   />
                   <MetricTile
-                    label="Max-Heap Total Priority Score"
+                    label="Total Priority Score"
                     value={totalScoreHeap.toFixed(1)}
                     icon={Award}
-                    caption="Guaranteed maximum total priority score"
+                    caption="Combined priority value of the recommended allocation"
                     tone="amber"
                   />
                   <MetricTile
-                    label="Execution Complexity Time"
+                    label="Planning Time"
                     value={`${maxHeapResult?.executionTimeMillis || 0}`}
                     suffix="ms"
                     icon={Gauge}
-                    caption="O(N log K) time complexity execution"
+                    caption="Measured response time from the planning service"
                     tone="green"
                   />
                 </div>
@@ -243,9 +226,9 @@ export default function PumpAllocationPage() {
                 {/* Top Allocated Farms Grid */}
                 <Panel className="p-6 overflow-hidden">
                   <PanelHeader
-                    eyebrow="Max-Heap Priority Extraction"
+                    eyebrow="Recommended allocation"
                     title="Top Priority Farms Granted Irrigation Pumps"
-                    description="Extracted directly from the Max-Heap priority queue."
+                    description="Farms are shown in recommended service order based on current operational need."
                     action={<Badge tone="green">{maxHeapResult?.allocatedFarms?.length || 0} Pumps Granted</Badge>}
                   />
 
@@ -284,7 +267,7 @@ export default function PumpAllocationPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Panel className="p-6">
             <PanelHeader
-              eyebrow="Priority Scoring Engine"
+              eyebrow="Farm assessment"
               title="Farm Priority Score Calculator"
               description="Calculate dry season irrigation priority score based on water deficiency %, land size, and urgency level."
             />
@@ -359,8 +342,8 @@ export default function PumpAllocationPage() {
           <Panel className="p-6">
             <PanelHeader
               eyebrow="Evaluation Outcome"
-              title="Priority Queue Placement Result"
-              description="Evaluated against Max-Heap threshold algorithm."
+              title="Irrigation Priority Result"
+              description="Evaluated against the current irrigation priority threshold."
             />
 
             {!calcResult ? (
@@ -399,9 +382,9 @@ export default function PumpAllocationPage() {
       {activeTab === 'comparison' && (
         <Panel className="p-6">
           <PanelHeader
-            eyebrow="Academic Benchmark"
-            title="Max-Heap vs TimSort vs Greedy Baseline"
-            description="Evaluates time complexity and optimality across synthetic farm datasets."
+            eyebrow="Performance insights"
+            title="Irrigation Planning Strategy Comparison"
+            description="Compare response time and allocation quality across different workload sizes."
             action={
               <Button variant="secondary" size="sm" onClick={() => handleRun()} disabled={running}>
                 <RefreshCw size={14} className={running ? 'animate-spin' : ''} /> Run Full Comparison
@@ -410,14 +393,14 @@ export default function PumpAllocationPage() {
           />
 
           {running ? (
-            <div className="py-12"><LoadingState message="Executing Max-Heap, TimSort, and Greedy algorithms..." /></div>
+            <div className="py-12"><LoadingState message="Comparing irrigation planning strategies…" /></div>
           ) : pumpBenchmark.length > 0 && (
             <div className="mt-6 space-y-8">
               <div className="grid gap-4 md:grid-cols-3">
                 {/* Max-Heap Card */}
                 <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/50 p-5 shadow-sm">
-                  <Badge tone="green">PRODUCTION ENGINE</Badge>
-                  <h3 className="mt-3 text-base font-extrabold text-graphite">{maxHeapResult?.algorithmUsed}</h3>
+                  <Badge tone="green">RECOMMENDED</Badge>
+                  <h3 className="mt-3 text-base font-extrabold text-graphite">{strategyLabel(maxHeapResult?.algorithmUsed)}</h3>
                   <div className="mt-4 text-2xl font-black text-emerald-800">{totalScoreHeap.toFixed(1)}</div>
                   <div className="text-xs text-muted font-medium">Total Priority Score Achieved</div>
                   <div className="mt-3 flex justify-between border-t border-emerald-200/60 pt-3 text-xs">
@@ -428,8 +411,8 @@ export default function PumpAllocationPage() {
 
                 {/* TimSort Card */}
                 <div className="rounded-2xl border border-sky-500/30 bg-sky-50/40 p-5 shadow-sm">
-                  <Badge tone="blue">FULL SORT BASELINE</Badge>
-                  <h3 className="mt-3 text-base font-extrabold text-graphite">{sortResult?.algorithmUsed}</h3>
+                  <Badge tone="blue">FULL REVIEW</Badge>
+                  <h3 className="mt-3 text-base font-extrabold text-graphite">{strategyLabel(sortResult?.algorithmUsed)}</h3>
                   <div className="mt-4 text-2xl font-black text-sky-800">
                     {sortResult?.allocatedFarms?.reduce((acc, f) => acc + f.priorityScore, 0).toFixed(1)}
                   </div>
@@ -442,8 +425,8 @@ export default function PumpAllocationPage() {
 
                 {/* Greedy Card */}
                 <div className="rounded-2xl border border-amber-500/30 bg-amber-50/40 p-5 shadow-sm">
-                  <Badge tone="amber">FCFS GREEDY BASELINE</Badge>
-                  <h3 className="mt-3 text-base font-extrabold text-graphite">{greedyResult?.algorithmUsed}</h3>
+                  <Badge tone="amber">REFERENCE</Badge>
+                  <h3 className="mt-3 text-base font-extrabold text-graphite">{strategyLabel(greedyResult?.algorithmUsed)}</h3>
                   <div className="mt-4 text-2xl font-black text-amber-800">
                     {greedyResult?.allocatedFarms?.reduce((acc, f) => acc + f.priorityScore, 0).toFixed(1)}
                   </div>
@@ -460,7 +443,7 @@ export default function PumpAllocationPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={pumpBenchmark.map((b) => ({
-                      algorithm: b.algorithmUsed,
+                      algorithm: strategyLabel(b.algorithmUsed),
                       'Total Priority Score': b.allocatedFarms?.reduce((acc, f) => acc + f.priorityScore, 0) || 0,
                     }))}
                   >

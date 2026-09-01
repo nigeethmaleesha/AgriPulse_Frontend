@@ -4,44 +4,77 @@
 
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #202923;
-  background: #f6f5ef;
+  color: #14241f;
+  background: #f4f7f5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 * { box-sizing: border-box; }
-html { background: #f6f5ef; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: #f6f5ef; }
+html { background: #f4f7f5; scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #f4f7f5; }
 button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 3px solid rgba(47, 107, 79, .25);
+  outline: 3px solid rgba(29, 106, 83, .2);
   outline-offset: 2px;
+}
+
+@layer base {
+  ::selection { @apply bg-tea-100 text-tea-950; }
+  table { border-collapse: separate; border-spacing: 0; }
+  thead th { @apply font-bold; }
 }
 
 @layer components {
   .surface {
-    @apply rounded-2xl border border-tea-950/10 bg-white/85 shadow-soft backdrop-blur-sm;
+    @apply rounded-[20px] border border-slate-200/80 bg-white shadow-card;
   }
   .surface-flat {
-    @apply rounded-2xl border border-tea-950/10 bg-white/70;
+    @apply rounded-[18px] border border-slate-200/80 bg-white;
+  }
+  .sidebar-panel {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(52, 211, 153, .13), transparent 31%),
+      linear-gradient(180deg, #0b342b 0%, #082a23 54%, #061f1a 100%);
   }
   .topographic {
-    background-color: #123D32;
+    background-color: #0d3b30;
     background-image:
-      radial-gradient(circle at 20% 20%, rgba(255,255,255,.08) 0 1px, transparent 1px),
-      repeating-radial-gradient(ellipse at 18% 110%, transparent 0 24px, rgba(255,255,255,.045) 25px 26px, transparent 27px 42px),
-      repeating-radial-gradient(ellipse at 105% -20%, transparent 0 34px, rgba(255,255,255,.04) 35px 36px, transparent 37px 54px);
-    background-size: 24px 24px, auto, auto;
+      radial-gradient(circle at 82% 12%, rgba(52, 211, 153, .18), transparent 30%),
+      linear-gradient(120deg, rgba(255,255,255,.04), transparent 40%),
+      repeating-radial-gradient(ellipse at 12% 120%, transparent 0 28px, rgba(255,255,255,.04) 29px 30px, transparent 31px 48px);
   }
   .grid-paper {
-    background-image: linear-gradient(rgba(18,61,50,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(18,61,50,.045) 1px, transparent 1px);
+    background-color: #fbfdfc;
+    background-image: linear-gradient(rgba(8,44,37,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(8,44,37,.035) 1px, transparent 1px);
     background-size: 28px 28px;
   }
   .mono-value { @apply font-mono tracking-tight; }
-  .section-kicker { @apply text-[11px] font-bold uppercase tracking-[0.18em] text-tea-700; }
+  .section-kicker { @apply text-[10px] font-extrabold uppercase tracking-[0.16em] text-tea-700; }
+  .icon-button { @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-tea-700/20 hover:bg-tea-50 hover:text-tea-800; }
+  .page-enter { animation: page-enter .35s ease-out both; }
+  .data-card { @apply rounded-2xl border border-slate-200/80 bg-white transition duration-200 hover:border-tea-700/20 hover:shadow-card; }
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: rgba(47,107,79,.2); border-radius: 999px; }
+.surface table thead { background: #f7faf8; }
+.surface table thead th { color: #69766f; }
+.surface table tbody tr { transition: background-color .15s ease; }
+.surface table tbody tr:hover { background: rgba(239, 249, 245, .65); }
+.surface table td, .surface table th { border-color: rgba(226, 232, 228, .8); }
+
+.sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.12) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(29,106,83,.18); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(29,106,83,.3); }
 ::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
