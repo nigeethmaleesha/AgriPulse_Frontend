@@ -14,6 +14,13 @@ import { Panel, PanelHeader } from '../../components/ui/Panel'
 import { Field, inputClass, selectClass } from '../../components/ui/FormControls'
 import { ErrorState, LoadingState } from '../../components/ui/Feedback'
 
+function strategyLabel(value = '') {
+  if (value.includes('0/1')) return 'Recommended Allocation'
+  if (value.includes('Fractional')) return 'Flexible Allocation'
+  if (value.includes('Greedy')) return 'Priority-First Allocation'
+  return value || 'Planning Strategy'
+}
+
 export default function FertilizerAllocationPage() {
   const {
     farms,
@@ -114,15 +121,15 @@ export default function FertilizerAllocationPage() {
       <div className="topographic relative mb-6 overflow-hidden rounded-[26px] px-6 py-7 text-white shadow-soft sm:px-8 sm:py-8">
         <div className="relative z-10 max-w-3xl">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge tone="green" className="!bg-white/12 !text-emerald-100">TASK 2A · MEMBER 3</Badge>
-            <Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">0/1 KNAPSACK DP ENGINE</Badge>
+            <Badge tone="green" className="!bg-white/12 !text-emerald-100">RESOURCE PLANNING</Badge>
+            <Badge tone="green" className="!bg-emerald-300/15 !text-emerald-100">BENEFIT-BASED ALLOCATION</Badge>
             <Badge tone={backendConnected ? 'green' : 'red'} className="!bg-black/20">
-              {backendConnected ? 'MODULE 2 BACKEND · LIVE' : 'BACKEND DISCONNECTED'}
+              {backendConnected ? 'LIVE DATA CONNECTED' : 'SERVICE UNAVAILABLE'}
             </Badge>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Fertilizer Stock Allocation Engine</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Fertilizer Allocation Planning</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
-            Optimize fertilizer bag distribution across tea smallholder farms. Uses 0/1 Knapsack Dynamic Programming to guarantee maximum agricultural benefit within stock capacity constraints.
+            Distribute available fertilizer stock across smallholder tea farms to achieve the strongest agricultural benefit within current supply limits.
           </p>
           
           {/* Navigation Tabs */}
@@ -135,7 +142,7 @@ export default function FertilizerAllocationPage() {
                   : 'bg-white/10 text-white hover:bg-white/15'
               }`}
             >
-              <Zap size={15} /> 0/1 Knapsack Allocation
+              <Zap size={15} /> Allocation Plan
             </button>
 
             <button
@@ -146,7 +153,7 @@ export default function FertilizerAllocationPage() {
                   : 'bg-white/10 text-white hover:bg-white/15'
               }`}
             >
-              <PlusCircle size={15} /> Submit Request / Farm
+              <PlusCircle size={15} /> Farm Requests
             </button>
 
             <button
@@ -157,7 +164,7 @@ export default function FertilizerAllocationPage() {
                   : 'bg-white/10 text-white hover:bg-white/15'
               }`}
             >
-              <BarChart3 size={15} /> Algorithm Benchmark Lab
+              <BarChart3 size={15} /> Performance Insights
             </button>
           </div>
         </div>
@@ -172,8 +179,8 @@ export default function FertilizerAllocationPage() {
           {/* Controls Panel */}
           <Panel className="mb-6 p-6">
             <PanelHeader
-              eyebrow="Stock Constraint Setup"
-              title="Run 0/1 Knapsack Allocation"
+              eyebrow="Allocation setup"
+              title="Create Fertilizer Allocation Plan"
               description="Enter the available stock of fertilizer bags for this allocation round."
               action={
                 <Button variant="secondary" size="sm" onClick={refreshData}>
@@ -228,7 +235,7 @@ export default function FertilizerAllocationPage() {
                     'Computing Optimal DP Matrix...'
                   ) : (
                     <>
-                      <Play size={16} /> Run 0/1 Knapsack DP
+                      <Play size={16} /> Create Allocation Plan
                     </>
                   )}
                 </Button>
@@ -285,7 +292,7 @@ export default function FertilizerAllocationPage() {
               <PanelHeader
                 eyebrow="DP Selection Outcome"
                 title="Approved Fertilizer Allocations"
-                description="Requests selected by 0/1 Knapsack DP to achieve maximum total benefit score."
+                description="Farm requests selected to achieve the strongest total benefit within the available stock."
                 action={
                   <Badge tone="green">
                     {allocationResult ? allocationResult.allocatedRequests.length : 0} Approved
@@ -295,7 +302,7 @@ export default function FertilizerAllocationPage() {
               <div className="p-4">
                 {!allocationResult ? (
                   <div className="py-12 text-center text-xs text-muted">
-                    Set a capacity and click <span className="font-bold text-graphite">Run 0/1 Knapsack DP</span> to view allocation outcomes.
+                    Set the available stock and click <span className="font-bold text-graphite">Create Allocation Plan</span> to view the recommended allocation.
                   </div>
                 ) : allocationResult.allocatedRequests.length === 0 ? (
                   <div className="py-8 text-center text-xs text-muted">No requests could be allocated with the current capacity.</div>
@@ -596,21 +603,21 @@ export default function FertilizerAllocationPage() {
         <>
           <Panel className="mb-6 p-6">
             <PanelHeader
-              eyebrow="Academic Evaluation"
-              title="Fertilizer Allocation Algorithm Comparison Lab"
-              description="Compares production 0/1 Knapsack DP against Fractional Knapsack and Greedy Priority baselines across 20, 200, and 2,000 synthetic requests."
+              eyebrow="Performance insights"
+              title="Fertilizer Planning Performance"
+              description="Compare allocation quality and processing time across small, medium, and large planning workloads."
               action={
                 <Button variant="secondary" size="sm" onClick={handleRunBenchmark} disabled={benchmarking}>
-                  <RefreshCw size={14} className={benchmarking ? 'animate-spin' : ''} /> Run Full Benchmark
+                  <RefreshCw size={14} className={benchmarking ? 'animate-spin' : ''} /> Refresh Insights
                 </Button>
               }
             />
 
             {benchmarking ? (
-              <div className="py-12"><LoadingState message="Running benchmarks across 20, 200, and 2000 datasets..." /></div>
+              <div className="py-12"><LoadingState message="Reviewing performance across small, medium, and large workloads…" /></div>
             ) : fertilizerBenchmark.length === 0 ? (
               <div className="py-12 text-center">
-                <Button onClick={handleRunBenchmark} className="!bg-tea-800 !text-white">Run Benchmark</Button>
+                <Button onClick={handleRunBenchmark} className="!bg-tea-800 !text-white">Run Performance Review</Button>
               </div>
             ) : (
               <div className="mt-6 space-y-8">
@@ -621,21 +628,21 @@ export default function FertilizerAllocationPage() {
                       data={[
                         {
                           size: '20 Requests',
-                          '0/1 Knapsack DP': fertilizerBenchmark[0]?.totalBenefitAchieved || 0,
-                          'Fractional Knapsack': fertilizerBenchmark[1]?.totalBenefitAchieved || 0,
-                          'Greedy Priority': fertilizerBenchmark[2]?.totalBenefitAchieved || 0,
+                          'Recommended Allocation': fertilizerBenchmark[0]?.totalBenefitAchieved || 0,
+                          'Flexible Allocation': fertilizerBenchmark[1]?.totalBenefitAchieved || 0,
+                          'Priority-First Allocation': fertilizerBenchmark[2]?.totalBenefitAchieved || 0,
                         },
                         {
                           size: '200 Requests',
-                          '0/1 Knapsack DP': fertilizerBenchmark[3]?.totalBenefitAchieved || 0,
-                          'Fractional Knapsack': fertilizerBenchmark[4]?.totalBenefitAchieved || 0,
-                          'Greedy Priority': fertilizerBenchmark[5]?.totalBenefitAchieved || 0,
+                          'Recommended Allocation': fertilizerBenchmark[3]?.totalBenefitAchieved || 0,
+                          'Flexible Allocation': fertilizerBenchmark[4]?.totalBenefitAchieved || 0,
+                          'Priority-First Allocation': fertilizerBenchmark[5]?.totalBenefitAchieved || 0,
                         },
                         {
                           size: '2,000 Requests',
-                          '0/1 Knapsack DP': fertilizerBenchmark[6]?.totalBenefitAchieved || 0,
-                          'Fractional Knapsack': fertilizerBenchmark[7]?.totalBenefitAchieved || 0,
-                          'Greedy Priority': fertilizerBenchmark[8]?.totalBenefitAchieved || 0,
+                          'Recommended Allocation': fertilizerBenchmark[6]?.totalBenefitAchieved || 0,
+                          'Flexible Allocation': fertilizerBenchmark[7]?.totalBenefitAchieved || 0,
+                          'Priority-First Allocation': fertilizerBenchmark[8]?.totalBenefitAchieved || 0,
                         },
                       ]}
                     >
@@ -644,9 +651,9 @@ export default function FertilizerAllocationPage() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="0/1 Knapsack DP" fill="#047857" />
-                      <Bar dataKey="Fractional Knapsack" fill="#0284c7" />
-                      <Bar dataKey="Greedy Priority" fill="#d97706" />
+                      <Bar dataKey="Recommended Allocation" fill="#047857" />
+                      <Bar dataKey="Flexible Allocation" fill="#0284c7" />
+                      <Bar dataKey="Priority-First Allocation" fill="#d97706" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -657,7 +664,7 @@ export default function FertilizerAllocationPage() {
                     <thead>
                       <tr className="border-b border-tea-950/15 text-muted uppercase font-bold">
                         <th className="py-2">Dataset Size</th>
-                        <th className="py-2">Algorithm</th>
+                        <th className="py-2">Planning Strategy</th>
                         <th className="py-2">Total Benefit Achieved</th>
                         <th className="py-2">Capacity Used</th>
                         <th className="py-2">Requests Allocated</th>
@@ -668,7 +675,7 @@ export default function FertilizerAllocationPage() {
                       {fertilizerBenchmark.map((item, index) => (
                         <tr key={index} className={item.algorithmName.includes('0/1') ? 'bg-emerald-50/50 font-semibold' : ''}>
                           <td className="py-3 font-bold">{item.datasetSize} Requests</td>
-                          <td className="py-3">{item.algorithmName}</td>
+                          <td className="py-3">{strategyLabel(item.algorithmName)}</td>
                           <td className="py-3 font-extrabold text-tea-950">
                             {item.totalBenefitAchieved?.toFixed(2)}
                           </td>

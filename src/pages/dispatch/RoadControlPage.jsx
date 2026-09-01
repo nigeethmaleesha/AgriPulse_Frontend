@@ -67,10 +67,10 @@ export default function RoadControlPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        module="DISPATCH CONTROL · PORT 8082"
-        engine="PUT /api/v1/dispatch/roads/{id}/status"
-        title="Road Conditions & Monsoon Hazard Control"
-        description="Dynamically block closed roads or toggle monsoon weather penalties in PostgreSQL to simulate real-world route recalculations."
+        module="COLLECTION & DISPATCH"
+        engine="LIVE ROAD STATUS"
+        title="Road Conditions & Weather Control"
+        description="Keep route planning accurate by recording closures and monsoon conditions across the collection network."
       />
 
       {banner && (
@@ -81,7 +81,7 @@ export default function RoadControlPage() {
         />
       )}
 
-      <Panel title="Database Road Network Status">
+      <Panel title="Collection Road Network Status">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wider text-muted">
