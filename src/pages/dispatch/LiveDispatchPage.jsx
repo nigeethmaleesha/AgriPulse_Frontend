@@ -346,7 +346,7 @@ export default function LiveDispatchPage() {
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-2">
                 <span className="text-muted">Database Engine</span>
-                <span className="font-bold text-tea-900">PostgreSQL (agripulse_db)</span>
+                <span className="font-bold text-tea-900">PostgreSQL (agripulse_module1_dispatch)</span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-2">
                 <span className="text-muted">Backend Service</span>

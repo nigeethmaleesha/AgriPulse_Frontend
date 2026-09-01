@@ -1,7 +1,11 @@
 import axios from 'axios'
 import { apiErrorMessage } from './client'
 
-export const DISPATCH_API_BASE_URL = (import.meta.env.VITE_DISPATCH_API_BASE_URL || '/dispatch-api').replace(/\/$/, '')
+export const DISPATCH_API_BASE_URL = (
+  import.meta.env.VITE_MODULE1_API_BASE_URL ||
+  import.meta.env.VITE_DISPATCH_API_BASE_URL ||
+  '/module1-api'
+).replace(/\/$/, '')
 
 export const dispatchClient = axios.create({
   baseURL: DISPATCH_API_BASE_URL,
