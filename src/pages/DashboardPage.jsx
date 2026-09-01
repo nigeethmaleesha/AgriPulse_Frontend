@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, Boxes, CheckCircle2, GitBranch, ShieldAlert, SlidersHorizontal, Truck } from 'lucide-react'
+import { Activity, ArrowRight, Boxes, CheckCircle2, Droplets, GitBranch, ShieldAlert, SlidersHorizontal, Sprout, Truck } from 'lucide-react'
 import { networkApi } from '../api/networkApi'
 import { apiErrorMessage } from '../api/client'
 import { useNetwork } from '../context/NetworkContext'
@@ -12,6 +12,18 @@ import { ErrorState, LoadingState } from '../components/ui/Feedback'
 import { NetworkGraph } from '../components/network/NetworkGraph'
 
 const actions = [
+  {
+    title: 'Fertilizer Knapsack DP Allocation (Port 8080)',
+    description: 'Optimize fertilizer bag distribution across tea farms using 0/1 Knapsack Dynamic Programming.',
+    to: '/fertilizer',
+    icon: Sprout,
+  },
+  {
+    title: 'Irrigation Pump Max-Heap Queue (Port 8080)',
+    description: 'Priority queue pump resource allocation for farms during dry seasons.',
+    to: '/pumps',
+    icon: Droplets,
+  },
   {
     title: 'Urgent Tea Collection Dispatch (Port 8082)',
     description: 'Calculate real-time shortest paths to high-priority harvest batches using Dijkstra + Max-Heap.',

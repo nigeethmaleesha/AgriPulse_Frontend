@@ -6,6 +6,8 @@ import { MobileNav } from './MobileNav'
 
 const titles = {
   '/': 'Operations Overview',
+  '/fertilizer': 'Fertilizer Allocation',
+  '/pumps': 'Irrigation Pump Allocation',
   '/network': 'Daily Tea Throughput',
   '/network/bottlenecks': 'Critical Connections',
   '/network/scenarios': 'What-If Capacity Planning',

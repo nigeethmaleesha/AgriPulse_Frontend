@@ -1,8 +1,13 @@
 import { NavLink } from 'react-router-dom'
 import {
   Activity, Boxes, Calculator, ChevronLeft, ChevronRight, ClipboardList, Gauge, GitBranch,
-  LayoutDashboard, Leaf, ListOrdered, Network, ShieldAlert, TestTube2, ThermometerSun, Truck
+  Droplets, LayoutDashboard, Leaf, ListOrdered, Network, ShieldAlert, Sprout, TestTube2, ThermometerSun, Truck
 } from 'lucide-react'
+
+const allocationLinks = [
+  { to: '/fertilizer', label: 'Fertilizer Knapsack DP', icon: Sprout },
+  { to: '/pumps', label: 'Pump Max-Heap Allocation', icon: Droplets },
+]
 
 const schedulingLinks = [
   { to: '/scheduling', label: 'Shift Scheduler', icon: ClipboardList },
@@ -33,7 +38,7 @@ function NavItem({ to, icon: Icon, children, collapsed }) {
   return (
     <NavLink
       to={to}
-      end={to === '/' || to === '/network' || to === '/spoilage' || to === '/dispatch' || to === '/scheduling'}
+      end={to === '/' || to === '/network' || to === '/spoilage' || to === '/dispatch' || to === '/scheduling' || to === '/fertilizer' || to === '/pumps'}
       className={({ isActive }) => `group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive ? 'bg-white text-tea-950 shadow-sm' : 'text-white/72 hover:bg-white/8 hover:text-white'}`}
     >
       <Icon size={18} className="shrink-0" />
@@ -57,6 +62,11 @@ export function Sidebar({ collapsed, onToggle }) {
         <NavItem to="/" icon={LayoutDashboard} collapsed={collapsed}>Operations Overview</NavItem>
 
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/[.06] p-2">
+          {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Resource Allocation</span><span className="rounded bg-emerald-300/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">M02 · 8083</span></div>}
+          <div className="space-y-1">{allocationLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
+        </div>
+
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.06] p-2">
           {!collapsed && <div className="mb-1 flex items-center justify-between px-2 py-1.5"><span className="text-xs font-bold text-white">Dispatch & Route Engine</span><span className="rounded bg-amber-300/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-200">PORT 8082 · LIVE</span></div>}
           <div className="space-y-1">{dispatchLinks.map((item) => <NavItem key={item.to} {...item} collapsed={collapsed}>{item.label}</NavItem>)}</div>
         </div>
@@ -83,7 +93,7 @@ export function Sidebar({ collapsed, onToggle }) {
       </nav>
 
       <div className="border-t border-white/10 p-3">
-        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />All 3 Modules Connected</div><div className="mt-1 text-[10px] leading-4 text-white/45">Module 3 (8080), Module 4 (8081), and Dispatch Engine (8082) connected.</div></div>}
+        {!collapsed && <div className="mb-3 rounded-xl border border-white/10 bg-black/10 p-3"><div className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="h-2 w-2 rounded-full bg-emerald-300" />Five Module Integration</div><div className="mt-1 text-[10px] leading-4 text-white/45">M3:8080 · M4:8081 · M1:8082 · M2:8083 · M5:8084</div></div>}
         <button onClick={onToggle} className="flex h-9 w-full items-center justify-center rounded-xl bg-white/[.07] text-white/65 hover:bg-white/10 hover:text-white" aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
         </button>
@@ -91,4 +101,3 @@ export function Sidebar({ collapsed, onToggle }) {
     </aside>
   )
 }
-
