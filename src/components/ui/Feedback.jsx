@@ -17,3 +17,30 @@ export function InlineError({ message }) {
 export function EmptyState({ title = 'No data yet', description = 'Run a network check to see results.', icon: Icon = DatabaseZap }) {
   return <div className="flex min-h-[170px] flex-col items-center justify-center px-6 py-8 text-center"><div className="rounded-2xl bg-tea-50 p-3 text-tea-700"><Icon size={22} /></div><p className="mt-3 font-bold text-graphite">{title}</p><p className="mt-1 max-w-md text-sm leading-5 text-muted">{description}</p></div>
 }
+
+export function FeedbackBanner({ type = 'info', message, onDismiss }) {
+  if (!message) return null
+  const isError = type === 'error'
+  const isWarning = type === 'warning'
+  const isSuccess = type === 'success'
+
+  const bannerClass = isError
+    ? 'border-red-200 bg-red-50 text-red-800'
+    : isWarning
+    ? 'border-amber-200 bg-amber-50 text-amber-900'
+    : isSuccess
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+    : 'border-slate-200 bg-slate-50 text-slate-800'
+
+  return (
+    <div className={`flex items-center justify-between rounded-xl border p-4 text-xs font-bold shadow-sm ${bannerClass}`}>
+      <span>{message}</span>
+      {onDismiss && (
+        <button onClick={onDismiss} className="ml-4 opacity-70 hover:opacity-100">
+          ✕
+        </button>
+      )}
+    </div>
+  )
+}
+
