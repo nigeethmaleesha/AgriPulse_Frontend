@@ -29,15 +29,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @layer components {
   .surface {
-    @apply rounded-[20px] border border-slate-200/80 bg-white shadow-card;
+    @apply rounded-2xl border border-tea-950/10 bg-white/90 shadow-soft backdrop-blur-sm transition-shadow duration-200 hover:shadow-lg;
   }
   .surface-flat {
-    @apply rounded-[18px] border border-slate-200/80 bg-white;
-  }
-  .sidebar-panel {
-    background:
-      radial-gradient(circle at 12% 0%, rgba(52, 211, 153, .13), transparent 31%),
-      linear-gradient(180deg, #0b342b 0%, #082a23 54%, #061f1a 100%);
+    @apply rounded-2xl border border-tea-950/10 bg-white/80 shadow-sm;
   }
   .topographic {
     background-color: #0d3b30;
