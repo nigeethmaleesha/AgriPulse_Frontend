@@ -21,10 +21,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @layer components {
   .surface {
-    @apply rounded-2xl border border-tea-950/10 bg-white/85 shadow-soft backdrop-blur-sm;
+    @apply rounded-2xl border border-tea-950/10 bg-white/90 shadow-soft backdrop-blur-sm transition-shadow duration-200 hover:shadow-lg;
   }
   .surface-flat {
-    @apply rounded-2xl border border-tea-950/10 bg-white/70;
+    @apply rounded-2xl border border-tea-950/10 bg-white/80 shadow-sm;
   }
   .topographic {
     background-color: #123D32;
