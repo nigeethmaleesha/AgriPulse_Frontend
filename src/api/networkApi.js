@@ -4,6 +4,8 @@ const root = '/api/network'
 
 export const networkApi = {
   getGraph: async () => (await apiClient.get(`${root}/graph`)).data,
+  clearGraph: async () => (await apiClient.delete(`${root}/graph`)).data,
+  loadDemoGraph: async () => (await apiClient.post(`${root}/graph/demo`)).data,
   getNodes: async () => (await apiClient.get(`${root}/nodes`)).data,
   createNode: async (payload) => (await apiClient.post(`${root}/nodes`, payload)).data,
   updateNode: async (id, payload) => (await apiClient.put(`${root}/nodes/${id}`, payload)).data,
